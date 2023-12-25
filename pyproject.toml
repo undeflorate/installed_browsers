@@ -19,6 +19,11 @@ packages = [
     { include = "installed_browsers"},
 ]
 
+[tool.poetry.dependencies]
+python = "^3.10"
+pyxdg = { version = ">=0.27,<0.29", markers = "sys_platform == 'linux'" }
+pywin32 = { version = ">=303,<307", markers = "sys_platform == 'win32'" }
+
 [tool.poetry.dev-dependencies]
 autoflake = "^1.7.8"
 black = "^23.3"
@@ -30,11 +35,51 @@ pytest-clarity = "^1.0.1"
 pytest-cov = "^4.1.0"
 
 [tool.isort]
+line_length = 120
+multi_line_output = 3
+force_grid_wrap = 0
+use_parentheses = true
+include_trailing_comma = true
+ensure_newline_before_comments = true
+atomic = true
 
+[tool.black]
+line-length = 120
+target-version = ['py39']
+include = '\.pyi?$'
+extend-exclude = """
+# A regex preceded with ^/ will apply only to files and directories
+# in the root of the project.
+^/setup.py
+"""
 
-[tool.poetry.group.dev.dependencies]
+[tool.mypy]
+disallow_untyped_defs = true
+ignore_missing_imports = true
 
-python-42 = "\"<^3.10\""
+[tool.mypy.overrides]
+module = [
+    "pkg_resources",
+]
+ignore_missing_imports = true
+
+[tool.flake8]
+max-line-length = 120
+extend-ignore = ["E203"]
+extend-exclude = """
+setup.py,
+"""
+
+[tool.pytest.ini_options]
+addopts = """\
+    --cov=browsers \
+    --cov-report=term-missing \
+    --cov-report=xml \
+    --cov-report=html \
+    -vv \
+    -x \
+    -s \
+"""
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
