@@ -1,0 +1,41 @@
+[tool.poetry]
+name = "installed-browsers"
+version = "0.1.0"
+repository = "https://github.com/undeflorate/installed_browsers"
+description = "Python library to check installed browsers"
+authors = ["undeflorate <swanslayer@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+classifiers = [
+    "Development Status :: 1 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Internet :: WWW/HTTP :: Browsers",
+    "Topic :: Software Development :: Library :: Python Module",
+    "Programming Language :: Python :: 3.10",
+    "programming Language :: Python :: 3.11",
+]
+
+packages = [
+    { include = "installed_browsers"},
+]
+
+[tool.poetry.dev-dependencies]
+autoflake = "^1.7.8"
+black = "^23.3"
+isort = "^5.11.5"
+mypy = "^1.4"
+pyproject-flake = "^5.04"
+pytest = "^7.4.3"
+pytest-clarity = "^1.0.1"
+pytest-cov = "^4.1.0"
+
+[tool.isort]
+
+
+[tool.poetry.group.dev.dependencies]
+
+python-42 = "\"<^3.10\""
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
