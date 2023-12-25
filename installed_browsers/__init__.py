@@ -49,7 +49,12 @@ def do_i_have_installed(name: str):
                 brave, brave-beta, brave-nightly
     :return: True or False depending on the browser is installed or not.
     """
-    return linux.do_i_have_installed(name)
+    match sys.platform:
+        case OS.LINUX:
+            return linux.do_i_have_installed(name)
+        case OS.MAC:
+            return mac.do_i_have_installed(name)
+        # case OS.WINDOWS: Windows is not yet supported.
 
 
 def give_me_details_of(name: str) -> Optional[Browser]:
@@ -71,8 +76,14 @@ def give_me_details_of(name: str) -> Optional[Browser]:
                 brave, brave-beta, brave-nightly
     :return: Dictionary containing browser name, description, desktop version and location.
     """
-    for found in (entity for entity in linux.get_details_of(name) if entity is not None):
-        return found
+    match sys.platform:
+        case OS.LINUX:
+            for found in (entity for entity in linux.get_details_of(name) if entity is not None):
+                return found
+        case OS.MAC:
+            for found in (entity for entity in mac.get_details_of(name) if entity is not None):
+                return found
+        # case OS.WINDOWS: Windows is not yet supported.
 
 
 def get_version_of(name: str) -> Optional[Version]:
@@ -94,8 +105,14 @@ def get_version_of(name: str) -> Optional[Version]:
                 brave, brave-beta, brave-nightly
     :return: Browser description and version.
     """
-    for found in (entity for entity in linux.get_version_of(name) if entity is not None):
-        return found
+    match sys.platform:
+        case OS.LINUX:
+            for found in (entity for entity in linux.get_version_of(name) if entity is not None):
+                return found
+        case OS.MAC:
+            for found in (entity for entity in mac.get_version_of(name) if entity is not None):
+                return found
+        # case OS.WINDOWS: Windows is not yet supported.
 
 
 def what_is_the_default_browser():
@@ -104,4 +121,9 @@ def what_is_the_default_browser():
 
     :return: Default browser information.
     """
-    return linux.what_is_the_default_browser()
+    match sys.platform:
+        case OS.LINUX:
+            return linux.what_is_the_default_browser()
+        # case OS.MAC: Mac is not yet supported.
+        #     return mac.what_is_the_default_browser()
+        # case OS.WINDOWS: Windows is not yet supported.

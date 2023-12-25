@@ -1,10 +1,9 @@
 import os
 import plistlib
 import subprocess
-import sys
 from typing import Iterator, Optional
 
-from .common import Browser, Version, OS
+from .common import Browser, Version
 
 # tuple of possible browsers
 POSSIBLE_BROWSERS = (
@@ -31,88 +30,78 @@ POSSIBLE_BROWSERS = (
 
 # get all installed browsers
 def browsers() -> Iterator[Browser]:
-    match sys.platform:
-        case OS.MAC:
-            for browser, bundle_id, version_string in POSSIBLE_BROWSERS:
-                paths = subprocess.getoutput(f'mdfind "kMDItemCFBundleIdentifier == {bundle_id}"').splitlines()
-                for path in paths:
-                    with open(os.path.join(path, "Contents/Info.plist"), "rb") as f:
-                        plist = plistlib.load(f)
-                        executable_name = plist.get("CFBundleExecutable")
-                        executable = os.path.join(path, "Contents/MacOS", executable_name)
-                        description = plist.get("CFBundleDisplayName") or plist.get("CFBundleName", browser)
-                        version = plist[version_string]
-                        yield Browser(
-                            name=browser,
-                            description=description,
-                            version=version,
-                            location=executable if browser != "safari" else path
-                        )
+    for browser, bundle_id, version_string in POSSIBLE_BROWSERS:
+        paths = subprocess.getoutput(f'mdfind "kMDItemCFBundleIdentifier == {bundle_id}"').splitlines()
+        for path in paths:
+            with open(os.path.join(path, "Contents/Info.plist"), "rb") as f:
+                plist = plistlib.load(f)
+                executable_name = plist.get("CFBundleExecutable")
+                executable = os.path.join(path, "Contents/MacOS", executable_name)
+                description = plist.get("CFBundleDisplayName") or plist.get("CFBundleName", browser)
+                version = plist[version_string]
+                yield Browser(
+                    name=browser,
+                    description=description,
+                    version=version,
+                    location=executable if browser != "safari" else path
+                )
 
 
 # get details of a browser
 def get_details_of(name) -> Optional[Browser]:
-    match sys.platform:
-        case OS.MAC:
-            for browser, bundle_id, version_string in (browser_record for browser_record in POSSIBLE_BROWSERS
-                                                       if browser_record[0] == name):
-                paths = subprocess.getoutput(f'mdfind "kMDItemCFBundleIdentifier == {bundle_id}"').splitlines()
-                for path in paths:
-                    with open(os.path.join(path, "Contents/Info.plist"), "rb") as f:
-                        plist = plistlib.load(f)
-                        executable_name = plist.get("CFBundleExecutable")
-                        executable = os.path.join(path, "Contents/MacOS", executable_name)
-                        description = plist.get("CFBundleDisplayName") or plist.get("CFBundleName", browser)
-                        version = plist[version_string]
-                        yield Browser(
-                            name=browser,
-                            description=description,
-                            version=version,
-                            location=executable if browser != "safari" else path
-                        )
+    for browser, bundle_id, version_string in (browser_record for browser_record in POSSIBLE_BROWSERS
+                                               if browser_record[0] == name):
+        paths = subprocess.getoutput(f'mdfind "kMDItemCFBundleIdentifier == {bundle_id}"').splitlines()
+        for path in paths:
+            with open(os.path.join(path, "Contents/Info.plist"), "rb") as f:
+                plist = plistlib.load(f)
+                executable_name = plist.get("CFBundleExecutable")
+                executable = os.path.join(path, "Contents/MacOS", executable_name)
+                description = plist.get("CFBundleDisplayName") or plist.get("CFBundleName", browser)
+                version = plist[version_string]
+                yield Browser(
+                    name=browser,
+                    description=description,
+                    version=version,
+                    location=executable if browser != "safari" else path
+                )
 
 
 # retrieve browser version
 def get_version_of(name) -> Optional[Version]:
-    match sys.platform:
-        case OS.MAC:
-            for browser, bundle_id, version_string in (browser_record for browser_record in POSSIBLE_BROWSERS
-                                                       if browser_record[0] == name):
-                paths = subprocess.getoutput(f'mdfind "kMDItemCFBundleIdentifier == {bundle_id}"').splitlines()
-                for path in paths:
-                    with open(os.path.join(path, "Contents/Info.plist"), "rb") as f:
-                        plist = plistlib.load(f)
-                        version = plist[version_string]
-                        yield Version(
-                            version=version
-                        )
-            yield "Browser is not installed."
+    for browser, bundle_id, version_string in (browser_record for browser_record in POSSIBLE_BROWSERS
+                                               if browser_record[0] == name):
+        paths = subprocess.getoutput(f'mdfind "kMDItemCFBundleIdentifier == {bundle_id}"').splitlines()
+        for path in paths:
+            with open(os.path.join(path, "Contents/Info.plist"), "rb") as f:
+                plist = plistlib.load(f)
+                version = plist[version_string]
+                yield Version(
+                    version=version
+                )
+    yield "Browser is not installed."
 
 
 # check if the given browser is installed
 def do_i_have_installed(name):
-    match sys.platform:
-        case OS.MAC:
-            for browser, bundle_id, version_string in (browser_record for browser_record in POSSIBLE_BROWSERS
-                                                       if browser_record[0] == name):
-                paths = subprocess.getoutput(f'mdfind "kMDItemCFBundleIdentifier == {bundle_id}"').splitlines()
-                for path in paths:
-                    with open(os.path.join(path, "Contents/Info.plist"), "rb") as f:
-                        plist = plistlib.load(f)
-                        executable_name = plist.get("CFBundleExecutable")
-                        if executable_name:
-                            return True
-            return False
+    for browser, bundle_id, version_string in (browser_record for browser_record in POSSIBLE_BROWSERS
+                                               if browser_record[0] == name):
+        paths = subprocess.getoutput(f'mdfind "kMDItemCFBundleIdentifier == {bundle_id}"').splitlines()
+        for path in paths:
+            with open(os.path.join(path, "Contents/Info.plist"), "rb") as f:
+                plist = plistlib.load(f)
+                executable_name = plist.get("CFBundleExecutable")
+                if executable_name:
+                    return True
+    return False
 
 
 # get default browser
 def what_is_the_default_browser() -> Optional[str]:
-    match sys.platform:
-        case OS.MAC:
-            # cmd = "xdg-settings get default-web-browser".split()
-            # if cmd:
-            #     default_browser = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip()
-            # else:
-            #     default_browser = "No browser is set to default."
-            # return default_browser
-            return "This function is not yet supported."
+    # cmd = "xdg-settings get default-web-browser".split()
+    # if cmd:
+    #     default_browser = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip()
+    # else:
+    #     default_browser = "No browser is set to default."
+    # return default_browser
+    return "This function is not yet supported."
