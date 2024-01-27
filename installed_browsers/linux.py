@@ -118,8 +118,7 @@ def do_i_have_installed(name):
 # get default browser
 def what_is_the_default_browser() -> Optional[str]:
     cmd = "xdg-settings get default-web-browser".split()
-    if cmd:
-        default_browser = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip()
-    else:
+    default_browser = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip()
+    if not default_browser:
         default_browser = "No browser is set to default."
     return default_browser

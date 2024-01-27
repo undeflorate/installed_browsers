@@ -7,12 +7,12 @@ authors = ["undeflorate <swanslayer@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 classifiers = [
-    "Development Status :: 1 - Beta",
+    "Development Status :: 1 - Planning",
     "License :: OSI Approved :: MIT License",
     "Topic :: Internet :: WWW/HTTP :: Browsers",
-    "Topic :: Software Development :: Library :: Python Module",
+    "Topic :: Software Development :: Libraries :: Python Modules",
     "Programming Language :: Python :: 3.10",
-    "programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.11",
 ]
 
 packages = [
@@ -72,7 +72,7 @@ setup.py,
 
 [tool.pytest.ini_options]
 addopts = """\
-    --cov=browsers \
+    --cov=installed_browsers \
     --cov-report=term-missing \
     --cov-report=xml \
     --cov-report=html \

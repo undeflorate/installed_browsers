@@ -27,7 +27,9 @@ def browsers() -> Iterator[Browser]:
         case OS.MAC:
             yield from mac.browsers()
         case _:
-            print("This operation system is not yet supported.")
+            yield Browser(
+                name="exception", description="This operating system is not yet supported.", version="", location=""
+            )
 
 
 def do_i_have_installed(name: str):
