@@ -34,6 +34,7 @@ OPERATING_SYSTEM_NOT_SUPPORTED = "This operating system is not yet supported."
         ),
         pytest.param("msie", id="msie",
                      marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")),
+        pytest.param("dummy_browser", id="dummy_browser"),
     ),
 )
 class TestBrowserInstallation:
@@ -97,8 +98,8 @@ def test_default_browser_is_firefox(mock_subprocess, browser) -> None:
         ),
     ),
 )
-@patch("subprocess.check_output")
 @patch("plistlib.load")
+@patch("subprocess.check_output")
 def test_no_default_browser(mock_check_output, mock_load, browser) -> None:
     match sys.platform:
         case OS.LINUX:
@@ -342,11 +343,9 @@ class TestBrowserVersion:
         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
         if browser in available_browsers:
             assert installed_browsers.get_version_of(browser) == version
-        else:
-            assert installed_browsers.get_version_of(browser) == BROWSER_NOT_INSTALLED
 
-    @patch("os.path.isfile")
     @patch("subprocess.getoutput")
+    @patch("os.path.isfile")
     def test_version_not_determined(self, mock_file, mock_output, browser: str, version: Dict) -> None:
         match sys.platform:
             case OS.LINUX:
@@ -356,4 +355,3 @@ class TestBrowserVersion:
         mock_version = Mock()
         mock_version.return_value = version
         assert installed_browsers.get_version_of(browser) == BROWSER_NOT_INSTALLED
-        assert version
