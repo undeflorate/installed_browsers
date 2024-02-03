@@ -22,14 +22,28 @@ def browsers() -> Iterator[Browser]:
     match sys.platform:
         case OS.LINUX:
             yield from linux.browsers()
-        case OS.WINDOWS:
-            yield from windows.browsers()
         case OS.MAC:
             yield from mac.browsers()
+        case OS.WINDOWS:
+            yield from windows.browsers()
         case _:
             yield Browser(
                 name="exception", description="This operating system is not yet supported.", version="", location=""
             )
+
+
+def what_is_the_default_browser():
+    """
+    Shows the default browser in system - if there is any.
+
+    :return: Default browser information.
+    """
+    match sys.platform:
+        case OS.LINUX:
+            return linux.what_is_the_default_browser()
+        case OS.MAC:
+            return mac.what_is_the_default_browser()
+        # case OS.WINDOWS: Windows is not yet supported.
 
 
 def do_i_have_installed(name: str):
@@ -114,18 +128,4 @@ def get_version_of(name: str) -> Optional[Version]:
         case OS.MAC:
             for found in (entity for entity in mac.get_version_of(name) if entity is not None):
                 return found
-        # case OS.WINDOWS: Windows is not yet supported.
-
-
-def what_is_the_default_browser():
-    """
-    Shows the default browser in system - if there is any.
-
-    :return: Default browser information.
-    """
-    match sys.platform:
-        case OS.LINUX:
-            return linux.what_is_the_default_browser()
-        # case OS.MAC: Mac is not yet supported.
-        #     return mac.what_is_the_default_browser()
         # case OS.WINDOWS: Windows is not yet supported.

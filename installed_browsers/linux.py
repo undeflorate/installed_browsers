@@ -55,6 +55,30 @@ def browsers() -> Iterator[Browser]:
                 )
 
 
+# get default browser
+def what_is_the_default_browser() -> Optional[str]:
+    cmd = "xdg-settings get default-web-browser".split()
+    default_browser = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip()
+    if not default_browser:
+        default_browser = "No browser is set to default."
+    return default_browser
+
+
+# check if the given browser is installed
+def do_i_have_installed(name):
+    for browser, desktop_names in (browser_record for browser_record in POSSIBLE_BROWSERS
+                                   if browser_record[0] == name):
+        for desktop_name in desktop_names:
+            for application_dir in BROWSER_LOCATIONS:
+                path = os.path.join(application_dir, f"{desktop_name}.desktop")
+                if not os.path.isfile(path):
+                    continue
+                entry = DesktopEntry(path)
+                if entry:
+                    return True
+    return False
+
+
 # get details of a browser
 def get_details_of(name) -> Optional[Browser]:
     for browser, desktop_names in (browser_record for browser_record in POSSIBLE_BROWSERS
@@ -98,27 +122,3 @@ def get_version_of(name) -> Optional[Version]:
                     version=version
                 )
     yield "Browser is not installed."
-
-
-# check if the given browser is installed
-def do_i_have_installed(name):
-    for browser, desktop_names in (browser_record for browser_record in POSSIBLE_BROWSERS
-                                   if browser_record[0] == name):
-        for desktop_name in desktop_names:
-            for application_dir in BROWSER_LOCATIONS:
-                path = os.path.join(application_dir, f"{desktop_name}.desktop")
-                if not os.path.isfile(path):
-                    continue
-                entry = DesktopEntry(path)
-                if entry:
-                    return True
-    return False
-
-
-# get default browser
-def what_is_the_default_browser() -> Optional[str]:
-    cmd = "xdg-settings get default-web-browser".split()
-    default_browser = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip()
-    if not default_browser:
-        default_browser = "No browser is set to default."
-    return default_browser

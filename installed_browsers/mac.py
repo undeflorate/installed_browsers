@@ -1,6 +1,7 @@
 import os
 import plistlib
 import subprocess
+from pathlib import Path
 from typing import Iterator, Optional
 
 from .common import Browser, Version
@@ -47,6 +48,62 @@ def browsers() -> Iterator[Browser]:
                 )
 
 
+# get default browser
+def what_is_the_default_browser() -> Optional[str]:
+    PREFERENCES = (
+        Path.home()
+        / "Library"
+        / "Preferences"
+        / "com.apple.LaunchServices/com.apple.launchservices.secure.plist"
+    )
+
+    SUPPORTED_BROWSERS = {
+        "": "No browser is set to default.",
+        "com.google.Chrome": "Google Chrome",
+        "com.google.Chrome.canary": "Chrome-Canary",
+        "org.chromium.Chromium": "Chromium",
+        "org.mozilla.firefox": "Firefox",
+        "org.mozilla.firefoxdeveloperedition": "Firefox-developer",
+        "org.mozilla.nightly": "Firefox-nightly",
+        "com.apple.Safari": "Safari",
+        "com.operasoftware.Opera": "Opera",
+        "com.operasoftware.OperaNext": "Opera-beta",
+        "com.operasoftware.OperaDeveloper": "Opera-developer",
+        "com.microsoft.edgemac": "MSEdge",
+        "com.microsoft.edgemac.Beta": "MSEdge-beta",
+        "com.microsoft.edgemac.Dev": "MSEdge-dev",
+        "com.microsoft.edgemac.Canary": "MSEdge-canary",
+        "com.brave.Browser": "Brave",
+        "com.brave.Browser.beta": "Brave-Beta",
+        "com.brave.Browser.dev": "Brave-Dev",
+        "com.brave.Browser.nightly": "Brave-Nightly"
+    }
+
+    with PREFERENCES.open("rb") as config_file:
+        configuration = plistlib.load(config_file)
+
+    default_browser = "No browser is set to default."
+    for handler in configuration["LSHandlers"]:
+        if handler.get("LSHandlerURLScheme") == "https":
+            role = handler["LSHandlerRoleAll"]
+            default_browser = SUPPORTED_BROWSERS[role]
+    return default_browser
+
+
+# check if the given browser is installed
+def do_i_have_installed(name):
+    for browser, bundle_id, version_string in (browser_record for browser_record in POSSIBLE_BROWSERS
+                                               if browser_record[0] == name):
+        paths = subprocess.getoutput(f'mdfind "kMDItemCFBundleIdentifier == {bundle_id}"').splitlines()
+        for path in paths:
+            with open(os.path.join(path, "Contents/Info.plist"), "rb") as f:
+                plist = plistlib.load(f)
+                executable_name = plist.get("CFBundleExecutable")
+                if executable_name:
+                    return True
+    return False
+
+
 # get details of a browser
 def get_details_of(name) -> Optional[Browser]:
     for browser, bundle_id, version_string in (browser_record for browser_record in POSSIBLE_BROWSERS
@@ -65,6 +122,7 @@ def get_details_of(name) -> Optional[Browser]:
                     version=version,
                     location=executable if browser != "safari" else path
                 )
+        yield "Browser is not installed."
 
 
 # retrieve browser version
@@ -80,28 +138,3 @@ def get_version_of(name) -> Optional[Version]:
                     version=version
                 )
     yield "Browser is not installed."
-
-
-# check if the given browser is installed
-def do_i_have_installed(name):
-    for browser, bundle_id, version_string in (browser_record for browser_record in POSSIBLE_BROWSERS
-                                               if browser_record[0] == name):
-        paths = subprocess.getoutput(f'mdfind "kMDItemCFBundleIdentifier == {bundle_id}"').splitlines()
-        for path in paths:
-            with open(os.path.join(path, "Contents/Info.plist"), "rb") as f:
-                plist = plistlib.load(f)
-                executable_name = plist.get("CFBundleExecutable")
-                if executable_name:
-                    return True
-    return False
-
-
-# get default browser
-def what_is_the_default_browser() -> Optional[str]:
-    # cmd = "xdg-settings get default-web-browser".split()
-    # if cmd:
-    #     default_browser = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip()
-    # else:
-    #     default_browser = "No browser is set to default."
-    # return default_browser
-    return "This function is not yet supported."
