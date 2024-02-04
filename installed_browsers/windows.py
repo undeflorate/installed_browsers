@@ -33,8 +33,8 @@ def browsers() -> Iterator[Browser]:
     yield from _win32_browsers_from_registry(winreg.HKEY_CURRENT_USER, winreg.KEY_READ)
     yield from _win32_browsers_from_registry(winreg.HKEY_LOCAL_MACHINE,
                                              winreg.KEY_READ | winreg.KEY_WOW64_64KEY)
-    yield from _win32_browsers_from_registry(winreg.HKEY_LOCAL_MACHINE,
-                                             winreg.KEY_READ | winreg.KEY_WOW64_32KEY)
+    # yield from _win32_browsers_from_registry(winreg.HKEY_LOCAL_MACHINE,
+    #                                          winreg.KEY_READ | winreg.KEY_WOW64_32KEY)
 
 
 # get browsers from registry
