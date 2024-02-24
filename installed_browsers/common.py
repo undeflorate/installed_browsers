@@ -5,6 +5,8 @@ class OS:
     LINUX = "linux"
     WINDOWS = "win32"
     MAC = "darwin"
+    WIN32 = "32bit"
+    WIN64 = "64bit"
 
 
 class Browser(TypedDict):

@@ -15,7 +15,10 @@ These tests are based on which browsers exist in GitHub Actions virtual environm
 
 DEFAULT_BROWSER_LINUX = "firefox_firefox.desktop"
 DEFAULT_BROWSER_MAC = "Firefox"
-DEFAULT_BROWSER_WINDOWS = ""
+DEFAULT_BROWSER_WINDOWS = "Microsoft Edge"
+BROWSER_FIREFOX = "Mozilla Firefox"
+BROWSER_CHROME_CANARY = "Google Chrome Canary"
+BROWSER_EDGE = "Microsoft Edge"
 NO_DEFAULT_BROWSER = "No browser is set to default."
 BROWSER_NOT_INSTALLED = "Browser is not installed."
 OPERATING_SYSTEM_NOT_SUPPORTED = "This operating system is not yet supported."
@@ -25,6 +28,7 @@ OPERATING_SYSTEM_NOT_SUPPORTED = "This operating system is not yet supported."
     "browser",
     (
         pytest.param("chrome", id="chrome"),
+        pytest.param("chromium", id="chromium"),
         pytest.param("firefox", id="firefox"),
         pytest.param("safari", id="safari",
                      marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")),
@@ -66,48 +70,81 @@ def test_os_is_not_supported() -> None:
             b'firefox_firefox.desktop', id="firefox",
             marks=pytest.mark.skipif(sys.platform != "linux", reason="linux-only")
         ),
+        # pytest.param(
+        #     "Firefox", id="firefox",
+        #     marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")
+        # ),
         pytest.param(
-            "Firefox", id="firefox",
-            marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")
+            {'LSHandlers': [{'LSHandlerURLScheme': 'https', 'LSHandlerRoleAll': 'org.mozilla.firefox',
+                             'LSHandlerPreferredVersions': {'LSHandlerRoleAll': '-'}}]},
+            id="firefox", marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")
+        ),
+        pytest.param(
+            "Microsoft Edge", id="msedge",
+            marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")
+        ),
+        pytest.param(
+            "Mozilla Firefox", id="firefox",
+            marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")
+        ),
+        pytest.param(
+            "Google Chrome Canary", id="msedge",
+            marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")
         ),
     ),
 )
+@patch("plistlib.load")
 @patch("subprocess.check_output")
-def test_default_browser_is_firefox(mock_subprocess, browser) -> None:
-    mock_subprocess.return_value = browser
+@patch('winreg.QueryValueEx')
+def test_default_browser(mock_winreg, mock_subprocess, mock_load, browser) -> None:
     match sys.platform:
         case OS.LINUX:
+            mock_subprocess.return_value = browser
             assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_LINUX
         case OS.MAC:
+            mock_load.return_value = browser
             assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_MAC
         case OS.WINDOWS:
-            assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_WINDOWS
+            if browser == BROWSER_FIREFOX:
+                mock_winreg.return_value = ("FirefoxURL-308046B0AF4A39CB", 0)
+                assert installed_browsers.what_is_the_default_browser() == "Mozilla Firefox"
+            elif browser == BROWSER_CHROME_CANARY:
+                mock_winreg.return_value = ("ChromeSSHTM.308046B0AF4A39CB", 0)
+                assert installed_browsers.what_is_the_default_browser() == "Google Chrome Canary"
+            elif browser == BROWSER_EDGE:
+                mock_winreg.return_value = ("MSEdgeHTM", 0)
+                assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_WINDOWS
 
 
 @pytest.mark.parametrize(
     "browser",
     (
         pytest.param(
-            b'', id="firefox",
+            b'', id="no_default_linux",
             marks=pytest.mark.skipif(sys.platform != "linux", reason="linux-only")
         ),
         pytest.param(
             {'LSHandlers': [{'LSHandlerURLScheme': 'https', 'LSHandlerRoleAll': '',
                              'LSHandlerPreferredVersions': {'LSHandlerRoleAll': '-'}}]},
-            id="firefox", marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")
+            id="no_default_mac", marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")
+        ),
+        pytest.param(
+            ("", 0), id="no_default_windows",
+            marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")
         ),
     ),
 )
 @patch("plistlib.load")
 @patch("subprocess.check_output")
-def test_no_default_browser(mock_check_output, mock_load, browser) -> None:
+@patch('winreg.QueryValueEx')
+def test_no_default_browser(mock_winreg, mock_check_output, mock_load, browser) -> None:
     match sys.platform:
         case OS.LINUX:
             mock_check_output.return_value = browser
         case OS.MAC:
             mock_load.return_value = browser
         case OS.WINDOWS:
-            mock_check_output.return_value = ""
+            mock_winreg.return_value = browser
     assert installed_browsers.what_is_the_default_browser() == NO_DEFAULT_BROWSER
 
 
@@ -194,10 +231,10 @@ def test_no_default_browser(mock_check_output, mock_load, browser) -> None:
         pytest.param(
             "chrome",
             {
-                "browser_type": "chrome",
-                "display_name": "Google Chrome",
-                "path": r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+                "name": "chrome",
+                "description": "Google Chrome",
                 "version": ANY,
+                "location": r"C:\Program Files\Google\Chrome\Application\chrome.exe",
             },
             marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only"),
             id="chrome-win32",
@@ -205,10 +242,10 @@ def test_no_default_browser(mock_check_output, mock_load, browser) -> None:
         pytest.param(
             "firefox",
             {
-                "browser_type": "firefox",
-                "display_name": "Mozilla Firefox",
-                "path": r"C:\Program Files\Mozilla Firefox\firefox.exe",
+                "name": "firefox",
+                "description": "Mozilla Firefox",
                 "version": ANY,
+                "location": r"C:\Program Files\Mozilla Firefox\firefox.exe",
             },
             marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only"),
             id="firefox-win32",
@@ -216,10 +253,10 @@ def test_no_default_browser(mock_check_output, mock_load, browser) -> None:
         pytest.param(
             "msedge",
             {
-                "browser_type": "msedge",
-                "display_name": "Microsoft Edge",
-                "path": r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+                "name": "msedge",
+                "description": "Microsoft Edge",
                 "version": ANY,
+                "location": r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
             },
             marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only"),
             id="msedge-win32",
@@ -234,6 +271,14 @@ def test_no_default_browser(mock_check_output, mock_load, browser) -> None:
             },
             marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only"),
             id="msie-win32",
+        ),
+        pytest.param(
+            "dummy_browser",
+            {
+                "version": ANY,
+            },
+            marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only"),
+            id="dummy-win32",
         ),
     ),
 )
@@ -336,6 +381,14 @@ def test_get_browser_details(browser: str, details: Dict) -> None:
             marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only"),
             id="msie-win32",
         ),
+        pytest.param(
+            "dummy_browser",
+            {
+                "version": ANY,
+            },
+            marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only"),
+            id="dummy-win32",
+        ),
     ),
 )
 class TestBrowserVersion:
@@ -346,12 +399,16 @@ class TestBrowserVersion:
 
     @patch("subprocess.getoutput")
     @patch("os.path.isfile")
-    def test_version_not_determined(self, mock_file, mock_output, browser: str, version: Dict) -> None:
+    @patch("winreg.QueryValue")
+    def test_version_not_determined(self, mock_winreg, mock_file, mock_output, browser: str, version: Dict) -> None:
         match sys.platform:
             case OS.LINUX:
                 mock_file.return_value = False
             case OS.MAC:
                 mock_output.return_value = ""
-        mock_version = Mock()
-        mock_version.return_value = version
+            case OS.WINDOWS:
+                mock_winreg.return_value = "dummy"
+
+        # mock_version = Mock()
+        # mock_version.return_value = version
         assert installed_browsers.get_version_of(browser) == BROWSER_NOT_INSTALLED

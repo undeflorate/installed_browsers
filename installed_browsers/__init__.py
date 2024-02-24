@@ -1,4 +1,3 @@
-import fnmatch
 import sys
 from typing import Iterator, Optional
 
@@ -13,6 +12,7 @@ __all__ = ["Browser",
            "what_is_the_default_browser"]
 
 
+# get installed browsers
 def browsers() -> Iterator[Browser]:
     """
     Iterates over installed browsers.
@@ -32,6 +32,7 @@ def browsers() -> Iterator[Browser]:
             )
 
 
+# get default browser
 def what_is_the_default_browser():
     """
     Shows the default browser in system - if there is any.
@@ -43,9 +44,11 @@ def what_is_the_default_browser():
             return linux.what_is_the_default_browser()
         case OS.MAC:
             return mac.what_is_the_default_browser()
-        # case OS.WINDOWS: Windows is not yet supported.
+        case OS.WINDOWS:
+            return windows.what_is_the_default_browser()
 
 
+# check if the given browser is installed
 def do_i_have_installed(name: str):
     """
     Checks if the provided browser is installed in system.
@@ -70,10 +73,12 @@ def do_i_have_installed(name: str):
             return linux.do_i_have_installed(name)
         case OS.MAC:
             return mac.do_i_have_installed(name)
-        # case OS.WINDOWS: Windows is not yet supported.
+        case OS.WINDOWS:
+            return windows.do_i_have_installed(name)
 
 
-def give_me_details_of(name: str) -> Optional[Browser]:
+# retrieve browser details
+def give_me_details_of(name: str) -> Optional[Browser | str]:
     """
     Retrieve browser details if the provided browser is installed in system.
 
@@ -99,10 +104,15 @@ def give_me_details_of(name: str) -> Optional[Browser]:
         case OS.MAC:
             for found in (entity for entity in mac.get_details_of(name) if entity is not None):
                 return found
-        # case OS.WINDOWS: Windows is not yet supported.
+        case OS.WINDOWS:
+            for found in windows.get_details_of(name):
+                for details in found:
+                    return details
+            return "Browser is not installed."
 
 
-def get_version_of(name: str) -> Optional[Version]:
+# retrieve browser version
+def get_version_of(name: str) -> Optional[Version | str]:
     """
     Retrieve browser version if the provided browser is installed in system.
 
@@ -128,4 +138,8 @@ def get_version_of(name: str) -> Optional[Version]:
         case OS.MAC:
             for found in (entity for entity in mac.get_version_of(name) if entity is not None):
                 return found
-        # case OS.WINDOWS: Windows is not yet supported.
+        case OS.WINDOWS:
+            for found in windows.get_version_of(name):
+                for version in found:
+                    return version
+            return "Browser is not installed."
