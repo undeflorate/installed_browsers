@@ -1,12 +1,21 @@
 import os
 import pathlib
 import platform
-import winreg
 from typing import Iterator, Optional
 
-import win32api
-
 from .common import Browser, OS, Version
+
+try:
+    # noinspection PyUnresolvedReferences
+    import winreg
+except ImportError:
+    print("Operating system is not Windows, winreg is not imported.")
+
+try:
+    # noinspection PyUnresolvedReferences
+    import win32api
+except ImportError:
+    print("Operating system is not Windows, win32api is not imported.")
 
 # dictionary of possible browsers
 POSSIBLE_BROWSERS = {

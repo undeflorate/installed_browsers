@@ -122,7 +122,7 @@ def get_details_of(name) -> Optional[Browser]:
                     version=version,
                     location=executable if browser != "safari" else path
                 )
-        yield "Browser is not installed."
+    yield "Browser is not installed."
 
 
 # retrieve browser version
