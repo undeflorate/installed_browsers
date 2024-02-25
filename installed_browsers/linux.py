@@ -99,6 +99,7 @@ def get_details_of(name) -> Optional[Browser]:
                 yield Browser(
                     name=browser, description=entry.getName(), version=version, location=executable_path
                 )
+    yield "Browser is not installed."
 
 
 # retrieve browser version
