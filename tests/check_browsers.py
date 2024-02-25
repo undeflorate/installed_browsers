@@ -28,6 +28,9 @@ match sys.platform:
     case OS.LINUX | OS.MAC:
         MockWinreg = Mock()
         MockWinreg.QueryValueEx.return_value = dict(dummy="dummy")
+    case OS.WINDOWS:
+        import winreg
+        MockWinreg = winreg
 
 
 @pytest.mark.parametrize(
@@ -381,8 +384,7 @@ def test_get_browser_details(browser: str, details: Dict) -> None:
             {
                 "version": ANY,
             },
-            marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only"),
-            id="dummy_windows",
+            id="dummy_browser",
         ),
     ),
 )
@@ -404,7 +406,4 @@ class TestBrowserVersion:
                 mock_output.return_value = ""
             case OS.WINDOWS:
                 mock_winreg.return_value = "dummy"
-
-        # mock_version = Mock()
-        # mock_version.return_value = version
         assert installed_browsers.get_version_of(browser) == BROWSER_NOT_INSTALLED

@@ -8,13 +8,13 @@ from .common import Browser, OS, Version
 try:
     # noinspection PyUnresolvedReferences
     import winreg
-except ImportError:
+except ImportError:     # pragma: no cover
     print("Operating system is not Windows, winreg is not imported.")
 
 try:
     # noinspection PyUnresolvedReferences
     import win32api
-except ImportError:
+except ImportError:     # pragma: no cover
     print("Operating system is not Windows, win32api is not imported.")
 
 # dictionary of possible browsers
