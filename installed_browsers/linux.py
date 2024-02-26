@@ -14,9 +14,9 @@ POSSIBLE_BROWSERS = (
     ("chromium", ("chromium", "chromium_chromium", "chromium-browser")),
     ("firefox", ("firefox", "firefox_firefox")),
     ("ms-edge", ("microsoft-edge",)),
-    ("opera", ("opera_opera",)),
-    ("opera-beta", ("opera-beta_opera-beta",)),
-    ("opera-developer", ("opera-developer_opera-developer",)),
+    ("opera", ("opera",)),
+    ("opera-beta", ("opera-beta",)),
+    ("opera-developer", ("opera-developer",)),
     ("brave", ("brave-browser", "brave_brave")),
     ("brave-beta", ("brave-browser-beta",)),
     ("brave-nightly", ("brave-browser-nightly",))
