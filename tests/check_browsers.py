@@ -11,11 +11,14 @@ from installed_browsers.common import OS
 
 """
 These tests are based on which browsers exist in GitHub Actions virtual environments.
+For Firefox in Mac, system can not make any difference between stable and beta version other than the application name.
+Beta version is not supported officially.
+For proper working, make sure that either stable or beta version is installed but not both.
 """
 
+# constant declaration
 DEFAULT_BROWSER_LINUX = "firefox_firefox.desktop"
 DEFAULT_BROWSER_MAC = "Firefox"
-DEFAULT_BROWSER_WINDOWS = "Microsoft Edge"
 BROWSER_FIREFOX = "Mozilla Firefox"
 BROWSER_CHROME_CANARY = "Google Chrome Canary"
 BROWSER_EDGE = "Microsoft Edge"
@@ -33,6 +36,7 @@ match sys.platform:
         MockWinreg = winreg
 
 
+# check if given browser is installed in system
 @pytest.mark.parametrize(
     "browser",
     (
@@ -51,14 +55,14 @@ match sys.platform:
     ),
 )
 class TestBrowserInstallation:
-    def test_installed_browsers(self, browser: str) -> None:
+    def test_installed_browsers(self, browser: str):
         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
         if browser in available_browsers:
             assert browser in available_browsers
         else:
             assert browser not in available_browsers
 
-    def test_browser_is_installed_or_not(self, browser: str) -> None:
+    def test_browser_is_installed_or_not(self, browser: str):
         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
         if browser in available_browsers:
             assert installed_browsers.do_i_have_installed(browser)
@@ -66,12 +70,14 @@ class TestBrowserInstallation:
             assert not installed_browsers.do_i_have_installed(browser)
 
 
+# only linux, mac and windows operating systems are supported
 @patch("sys.platform", "BDS")
-def test_os_is_not_supported() -> None:
+def test_os_is_not_supported():
     for browsers in installed_browsers.browsers():
         assert browsers['description'] == OPERATING_SYSTEM_NOT_SUPPORTED
 
 
+# check default browser
 @pytest.mark.parametrize(
     "browser",
     (
@@ -100,28 +106,31 @@ def test_os_is_not_supported() -> None:
 )
 @patch("plistlib.load")
 @patch("subprocess.check_output")
+@patch("subprocess.getoutput")
 @patch.dict("sys.modules", winreg=MockWinreg)
 @patch('winreg.QueryValueEx')
-def test_default_browser(mock_winreg, mock_subprocess, mock_load, browser) -> None:
+def test_default_browser(mock_winreg, mock_subprocess_get, mock_subprocess_check, mock_load, browser):
     match sys.platform:
         case OS.LINUX:
-            mock_subprocess.return_value = browser
+            mock_subprocess_check.return_value = browser
             assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_LINUX
         case OS.MAC:
-            mock_load.return_value = browser
+            mock_load.side_effect = [browser, {'CFBundleExecutable': 'firefox'}]
+            mock_subprocess_get.return_value = '/Applications/Firefox.app'
             assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_MAC
         case OS.WINDOWS:
             if browser == BROWSER_FIREFOX:
                 mock_winreg.return_value = ("FirefoxURL-308046B0AF4A39CB", 0)
-                assert installed_browsers.what_is_the_default_browser() == "Mozilla Firefox"
+                assert installed_browsers.what_is_the_default_browser() == BROWSER_FIREFOX
             elif browser == BROWSER_CHROME_CANARY:
                 mock_winreg.return_value = ("ChromeSSHTM.308046B0AF4A39CB", 0)
-                assert installed_browsers.what_is_the_default_browser() == "Google Chrome Canary"
+                assert installed_browsers.what_is_the_default_browser() == BROWSER_CHROME_CANARY
             elif browser == BROWSER_EDGE:
                 mock_winreg.return_value = ("MSEdgeHTM", 0)
-                assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_WINDOWS
+                assert installed_browsers.what_is_the_default_browser() == BROWSER_EDGE
 
 
+# check missing default browser
 @pytest.mark.parametrize(
     "browser",
     (
@@ -132,7 +141,12 @@ def test_default_browser(mock_winreg, mock_subprocess, mock_load, browser) -> No
         pytest.param(
             {'LSHandlers': [{'LSHandlerURLScheme': 'https', 'LSHandlerRoleAll': '',
                              'LSHandlerPreferredVersions': {'LSHandlerRoleAll': '-'}}]},
-            id="no_default_mac", marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")
+            id="no_default_empty_mac", marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")
+        ),
+        pytest.param(
+            {'LSHandlers': [{'LSHandlerURLScheme': 'https', 'LSHandlerRoleAll': 'org.mozilla.firefox',
+                             'LSHandlerPreferredVersions': {'LSHandlerRoleAll': '-'}}]},
+            id="no_default_deleted_mac", marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")
         ),
         pytest.param(
             ("", 0), id="no_default_windows",
@@ -144,17 +158,18 @@ def test_default_browser(mock_winreg, mock_subprocess, mock_load, browser) -> No
 @patch("subprocess.check_output")
 @patch.dict("sys.modules", winreg=MockWinreg)
 @patch('winreg.QueryValueEx')
-def test_no_default_browser(mock_winreg, mock_check_output, mock_load, browser) -> None:
+def test_no_default_browser(mock_winreg, mock_check_output, mock_load, browser):
     match sys.platform:
         case OS.LINUX:
             mock_check_output.return_value = browser
         case OS.MAC:
-            mock_load.return_value = browser
+            mock_load.side_effect = [browser, {'CFBundleExecutable': ''}]
         case OS.WINDOWS:
             mock_winreg.return_value = browser
     assert installed_browsers.what_is_the_default_browser() == NO_DEFAULT_BROWSER
 
 
+# check browser details
 @pytest.mark.parametrize(
     ("browser", "details"),
     (
@@ -282,13 +297,16 @@ def test_no_default_browser(mock_winreg, mock_check_output, mock_load, browser) 
         pytest.param(
             "dummy_browser",
             {
+                "name": ANY,
+                "description": ANY,
                 "version": ANY,
+                "location": ANY,
             },
             id="dummy_browser",
         ),
     ),
 )
-def test_get_browser_details(browser: str, details: Dict) -> None:
+def test_get_browser_details(browser: str, details: Dict):
     available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
     if browser in available_browsers:
         assert installed_browsers.give_me_details_of(browser) == details
@@ -296,6 +314,7 @@ def test_get_browser_details(browser: str, details: Dict) -> None:
         assert installed_browsers.give_me_details_of(browser) == BROWSER_NOT_INSTALLED
 
 
+# check browser version
 @pytest.mark.parametrize(
     ("browser", "version"),
     (
@@ -389,7 +408,7 @@ def test_get_browser_details(browser: str, details: Dict) -> None:
     ),
 )
 class TestBrowserVersion:
-    def test_version_of_browser(self, browser: str, version: Dict) -> None:
+    def test_version_of_browser(self, browser: str, version: Dict):
         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
         if browser in available_browsers:
             assert installed_browsers.get_version_of(browser) == version

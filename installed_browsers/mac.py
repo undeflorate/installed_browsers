@@ -24,7 +24,6 @@ POSSIBLE_BROWSERS = (
     ("msedge-canary", "com.microsoft.edgemac.Canary", "CFBundleVersion"),
     ("brave", "com.brave.Browser", "CFBundleVersion"),
     ("brave-beta", "com.brave.Browser.beta", "CFBundleVersion"),
-    ("brave-dev", "com.brave.Browser.dev", "CFBundleVersion"),
     ("brave-nightly", "com.brave.Browser.nightly", "CFBundleVersion"),
 )
 
@@ -59,24 +58,23 @@ def what_is_the_default_browser() -> Optional[str]:
 
     SUPPORTED_BROWSERS = {
         "": "No browser is set to default.",
-        "com.google.Chrome": "Google Chrome",
-        "com.google.Chrome.canary": "Chrome-Canary",
-        "org.chromium.Chromium": "Chromium",
+        "com.google.chrome": "Google Chrome",
+        "com.google.chrome.canary": "Google Chrome Canary",
+        "org.chromium.chromium": "Chromium",
         "org.mozilla.firefox": "Firefox",
-        "org.mozilla.firefoxdeveloperedition": "Firefox-developer",
-        "org.mozilla.nightly": "Firefox-nightly",
-        "com.apple.Safari": "Safari",
-        "com.operasoftware.Opera": "Opera",
-        "com.operasoftware.OperaNext": "Opera-beta",
-        "com.operasoftware.OperaDeveloper": "Opera-developer",
-        "com.microsoft.edgemac": "MSEdge",
-        "com.microsoft.edgemac.Beta": "MSEdge-beta",
-        "com.microsoft.edgemac.Dev": "MSEdge-dev",
-        "com.microsoft.edgemac.Canary": "MSEdge-canary",
-        "com.brave.Browser": "Brave",
-        "com.brave.Browser.beta": "Brave-Beta",
-        "com.brave.Browser.dev": "Brave-Dev",
-        "com.brave.Browser.nightly": "Brave-Nightly"
+        "org.mozilla.firefoxdeveloperedition": "Firefox Developer Edition",
+        "org.mozilla.nightly": "Firefox Nightly",
+        "com.apple.safari": "Safari",
+        "com.operasoftware.opera": "Opera",
+        "com.operasoftware.operanext": "Opera Beta",
+        "com.operasoftware.operadeveloper": "Opera Developer",
+        "com.microsoft.edgemac": "Microsoft Edge",
+        "com.microsoft.edgemac.beta": "Microsoft Edge Beta",
+        "com.microsoft.edgemac.dev": "Microsoft Edge Dev",
+        "com.microsoft.edgemac.canary": "Microsoft Edge Canary",
+        "com.brave.browser": "Brave Browser",
+        "com.brave.browser.beta": "Brave Browser Beta",
+        "com.brave.browser.nightly": "Brave Browser Nightly"
     }
 
     with PREFERENCES.open("rb") as config_file:
@@ -87,6 +85,12 @@ def what_is_the_default_browser() -> Optional[str]:
         if handler.get("LSHandlerURLScheme") == "https":
             role = handler["LSHandlerRoleAll"]
             default_browser = SUPPORTED_BROWSERS[role]
+            for name, bundle_id, version_string in (browser_record for browser_record in POSSIBLE_BROWSERS
+                                                    if browser_record[1].lower() == role):
+                # configuration plist is not updated when a default browser is deleted from system
+                # default browser should be checked if it is really installed
+                if not do_i_have_installed(name):
+                    default_browser = "No browser is set to default."
     return default_browser
 
 
