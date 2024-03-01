@@ -109,7 +109,8 @@ def test_os_is_not_supported():
 @patch("subprocess.getoutput")
 @patch.dict("sys.modules", winreg=MockWinreg)
 @patch('winreg.QueryValueEx')
-def test_default_browser(mock_winreg, mock_subprocess_get, mock_subprocess_check, mock_load, browser):
+@patch('winreg.QueryValue')
+def test_default_browser(mock_winreg_qv, mock_winreg_qve, mock_subprocess_get, mock_subprocess_check, mock_load, browser):
     match sys.platform:
         case OS.LINUX:
             mock_subprocess_check.return_value = browser
@@ -120,13 +121,16 @@ def test_default_browser(mock_winreg, mock_subprocess_get, mock_subprocess_check
             assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_MAC
         case OS.WINDOWS:
             if browser == BROWSER_FIREFOX:
-                mock_winreg.return_value = ("FirefoxURL-308046B0AF4A39CB", 0)
+                mock_winreg_qve.return_value = ["FirefoxURL-308046B0AF4A39CB"]
+                mock_winreg_qv.return_value = BROWSER_FIREFOX
                 assert installed_browsers.what_is_the_default_browser() == BROWSER_FIREFOX
             elif browser == BROWSER_CHROME_CANARY:
-                mock_winreg.return_value = ("ChromeSSHTM.308046B0AF4A39CB", 0)
+                mock_winreg_qve.return_value = ["ChromeSSHTM.308046B0AF4A39CB"]
+                mock_winreg_qv.return_value = BROWSER_CHROME_CANARY
                 assert installed_browsers.what_is_the_default_browser() == BROWSER_CHROME_CANARY
             elif browser == BROWSER_EDGE:
-                mock_winreg.return_value = ("MSEdgeHTM", 0)
+                mock_winreg_qve.return_value = ["MSEdgeHTM"]
+                mock_winreg_qv.return_value = BROWSER_EDGE
                 assert installed_browsers.what_is_the_default_browser() == BROWSER_EDGE
 
 
@@ -149,7 +153,11 @@ def test_default_browser(mock_winreg, mock_subprocess_get, mock_subprocess_check
             id="no_default_deleted_mac", marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")
         ),
         pytest.param(
-            ("", 0), id="no_default_windows",
+            [""], id="no_default_windows",
+            marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")
+        ),
+        pytest.param(
+            ["ChromeSSHTM.308046B0AF4A39CB"], id="no_default_windows",
             marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")
         ),
     ),
@@ -158,14 +166,16 @@ def test_default_browser(mock_winreg, mock_subprocess_get, mock_subprocess_check
 @patch("subprocess.check_output")
 @patch.dict("sys.modules", winreg=MockWinreg)
 @patch('winreg.QueryValueEx')
-def test_no_default_browser(mock_winreg, mock_check_output, mock_load, browser):
+@patch('winreg.QueryValue')
+def test_no_default_browser(mock_winreg_qv, mock_winreg_qve, mock_check_output, mock_load, browser):
     match sys.platform:
         case OS.LINUX:
             mock_check_output.return_value = browser
         case OS.MAC:
             mock_load.side_effect = [browser, {'CFBundleExecutable': ''}]
         case OS.WINDOWS:
-            mock_winreg.return_value = browser
+            mock_winreg_qve.return_value = browser
+            mock_winreg_qv.return_value = ""
     assert installed_browsers.what_is_the_default_browser() == NO_DEFAULT_BROWSER
 
 

@@ -74,14 +74,11 @@ EXECUTABLE = "exe"
 
 # get installed browsers
 def browsers() -> Iterator[Browser]:
-    yield from _get_browsers_from_registry(winreg.HKEY_CURRENT_USER, winreg.KEY_READ)
     match platform.architecture()[0]:
         case OS.WIN32:    # pragma: no cover
-            yield from _get_browsers_from_registry(winreg.HKEY_LOCAL_MACHINE,
-                                                   winreg.KEY_READ | winreg.KEY_WOW64_32KEY)
+            yield from _get_unique_browsers(winreg.KEY_WOW64_32KEY)
         case OS.WIN64:
-            yield from _get_browsers_from_registry(winreg.HKEY_LOCAL_MACHINE,
-                                                   winreg.KEY_READ | winreg.KEY_WOW64_64KEY)
+            yield from _get_unique_browsers(winreg.KEY_WOW64_64KEY)
 
 
 # get default browser
@@ -96,6 +93,10 @@ def what_is_the_default_browser() -> Optional[str]:
             elif DOT in default_browser:
                 default_browser = default_browser.split(".", 1)[0]
             description = DEFAULT_BROWSER_DETAILS.get(default_browser, "unknown")
+            for browser in (browser_record for browser_record in POSSIBLE_BROWSERS
+                            if description == browser_record):
+                if not do_i_have_installed(POSSIBLE_BROWSERS[browser]):
+                    description = "No browser is set to default."
     return description
 
 
@@ -301,3 +302,33 @@ def _setup_firefox_versions(browser_id: str) -> str:
                             if FIREFOX in name.lower()
                             and EXECUTABLE not in name.lower()):
             return description
+
+
+def _get_unique_browsers(winreg_key: str) -> Iterator[Browser]:
+    # get browsers from local machine
+    browsers_local_machine = _get_browsers_from_registry(winreg.HKEY_LOCAL_MACHINE,
+                                                         winreg.KEY_READ | winreg_key)
+
+    # get browsers from current user
+    browsers_current_user = _get_browsers_from_registry(winreg.HKEY_CURRENT_USER, winreg.KEY_READ)
+
+    # get browsers available in both places
+    duplicates = []
+    for browser_current_user in browsers_current_user:
+        yield browser_current_user
+
+        for browser_local_machine in _get_browsers_from_registry(winreg.HKEY_LOCAL_MACHINE,
+                                                                 winreg.KEY_READ | winreg_key):
+            if browser_current_user == browser_local_machine:
+                duplicates.append(browser_local_machine)
+                continue
+
+    # filter for unique browsers
+    for browser_local_machine in browsers_local_machine:
+        for duplicate in duplicates:
+            if duplicate == browser_local_machine:
+                browser_local_machine.clear()
+                break
+            elif browser_local_machine not in duplicates:
+                yield browser_local_machine
+                break
