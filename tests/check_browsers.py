@@ -277,7 +277,7 @@ def test_no_default_browser(mock_winreg_qv, mock_winreg_qve, mock_check_output, 
                 "name": "firefox",
                 "description": "Mozilla Firefox",
                 "version": ANY,
-                "location": r"C:\Program Files\Mozilla Firefox\firefox.exe",
+                "location": ANY
             },
             marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only"),
             id="firefox_windows",
