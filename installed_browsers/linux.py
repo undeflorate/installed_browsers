@@ -8,7 +8,8 @@ from xdg.DesktopEntry import DesktopEntry
 from .common import Browser, Version
 
 # tuple of possible browsers
-# desktop entry name may be different: "chromium_chromium.desktop" or "chromium-browser.desktop"
+# desktop entry name may be different for different architectures:
+# for example "chromium_chromium.desktop" or "chromium-browser.desktop"
 POSSIBLE_BROWSERS = (
     ("chrome", ("google-chrome",)),
     ("chromium", ("chromium", "chromium_chromium", "chromium-browser")),

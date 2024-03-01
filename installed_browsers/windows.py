@@ -9,13 +9,13 @@ try:
     # noinspection PyUnresolvedReferences
     import winreg
 except ImportError:     # pragma: no cover
-    print("Operating system is not Windows, winreg is not imported.")
+    import_error = "Operating system is not Windows, winreg is not imported."
 
 try:
     # noinspection PyUnresolvedReferences
     import win32api
 except ImportError:     # pragma: no cover
-    print("Operating system is not Windows, win32api is not imported.")
+    import_error = "Operating system is not Windows, win32api is not imported."
 
 # dictionary of possible browsers
 POSSIBLE_BROWSERS = {
@@ -51,7 +51,6 @@ DEFAULT_BROWSER_DETAILS = {
     "MSEdgeDHTML": "Microsoft Edge Dev",
     "MSEdgeSSHTM": "Microsoft Edge Canary",
     "IE.HTTP": "Internet Explorer",
-    "SafariHTML": "Safari",
     "BraveHTML": "Brave",
     "BraveBHTML": "Brave Beta",
     "BraveSSHTM": "Brave Nightly",
@@ -69,7 +68,7 @@ FIREFOX = "firefox"
 EXECUTABLE = "exe"
 
 
-# get installed browsers
+# get all installed browsers
 def browsers() -> Iterator[Browser]:
     match platform.architecture()[0]:
         case OS.WIN32:    # pragma: no cover
@@ -92,6 +91,8 @@ def what_is_the_default_browser() -> Optional[str]:
             description = DEFAULT_BROWSER_DETAILS.get(default_browser, "unknown")
             for browser in (browser_record for browser_record in POSSIBLE_BROWSERS
                             if description == browser_record):
+                # registry is not updated when a default browser is deleted from system
+                # default browser should be checked if it is really installed
                 if not do_i_have_installed(POSSIBLE_BROWSERS[browser]):
                     description = "No browser is set to default."
     return description
@@ -117,7 +118,7 @@ def do_i_have_installed(name):
     return False
 
 
-# retrieve browser details
+# get details of a browser
 def get_details_of(name) -> Optional[Browser | str]:
     for browser in (browser_record for browser_record in POSSIBLE_BROWSER_NAMES
                     if name == browser_record):
