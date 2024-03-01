@@ -43,9 +43,6 @@ DEFAULT_BROWSER_DETAILS = {
     "ChromeHTML": "Google Chrome",
     "ChromeSSHTM": "Google Chrome Canary",
     "ChromiumHTM": "Chromium",
-    "FirefoxURL.S": "Mozilla Firefox",
-    "FirefoxURL.N": "Firefox Nightly",
-    "FirefoxURL.D": "Firefox Developer Edition",
     "OperaStable": "Opera Stable",
     "Operabeta": "Opera beta",
     "Operadeveloper": "Opera developer",
@@ -295,16 +292,29 @@ def _create_browser_version(path: str) -> str:
 # determine firefox version
 def _setup_firefox_versions(browser_id: str) -> str:
     registry_path = str(pathlib.Path(r'Software\Classes', browser_id, "DefaultIcon"))
-    with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, registry_path) as key:
-        firefox_path = winreg.QueryValue(key, "")
-        path_split = firefox_path.split("\\", 10)
-        for description in (name for name in path_split
-                            if FIREFOX in name.lower()
-                            and EXECUTABLE not in name.lower()):
-            return description
+    # firefox version can be installed in both local machine and current user registries
+    try:
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, registry_path) as key:
+            firefox_path = winreg.QueryValue(key, "")
+            path_split = firefox_path.split("\\", 15)
+            for description in (name for name in path_split
+                                if FIREFOX in name.lower()
+                                and EXECUTABLE not in name.lower()):
+                return description
+    except FileNotFoundError:  # pragma: no cover
+        try:
+            with winreg.OpenKey(winreg.HKEY_CURRENT_USER, registry_path) as key:
+                firefox_path = winreg.QueryValue(key, "")
+                path_split = firefox_path.split("\\", 15)
+                for description in (name for name in path_split
+                                    if FIREFOX in name.lower()
+                                    and EXECUTABLE not in name.lower()):
+                    return description
+        except FileNotFoundError:  # pragma: no cover
+            pass
 
 
-def _get_unique_browsers(winreg_key: str) -> Iterator[Browser]:
+def _get_unique_browsers(winreg_key) -> Iterator[Browser]:
     # get browsers from local machine
     browsers_local_machine = _get_browsers_from_registry(winreg.HKEY_LOCAL_MACHINE,
                                                          winreg.KEY_READ | winreg_key)
