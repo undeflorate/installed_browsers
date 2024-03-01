@@ -14,10 +14,12 @@ POSSIBLE_BROWSERS = (
     ("chrome", ("google-chrome",)),
     ("chromium", ("chromium", "chromium_chromium", "chromium-browser")),
     ("firefox", ("firefox", "firefox_firefox")),
-    ("ms-edge", ("microsoft-edge",)),
     ("opera", ("opera",)),
     ("opera-beta", ("opera-beta",)),
     ("opera-developer", ("opera-developer",)),
+    ("msedge", ("microsoft-edge",)),
+    ("msedge-beta", ("microsoft-edge-beta",)),
+    ("msedge-dev", ("microsoft-edge-dev",)),
     ("brave", ("brave-browser", "brave_brave")),
     ("brave-beta", ("brave-browser-beta",)),
     ("brave-nightly", ("brave-browser-nightly",))
@@ -62,6 +64,8 @@ def what_is_the_default_browser() -> Optional[str]:
     default_browser = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip()
     if not default_browser:
         default_browser = "No browser is set to default."
+    else:
+        default_browser = _get_browser_description(default_browser)
     return default_browser
 
 
@@ -124,3 +128,13 @@ def get_version_of(name) -> Optional[Version]:
                     version=version
                 )
     yield "Browser is not installed."
+
+
+# determine browser description
+def _get_browser_description(desktop_name):
+    for application_dir in BROWSER_LOCATIONS:
+        path = os.path.join(application_dir, desktop_name)
+        if not os.path.isfile(path):
+            continue
+        entry = DesktopEntry(path)
+        return entry.getName()

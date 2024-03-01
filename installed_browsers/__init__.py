@@ -6,18 +6,19 @@ from .common import Browser, Version, OS
 
 __all__ = ["Browser",
            "browsers",
+           "what_is_the_default_browser",
            "do_i_have_installed",
            "give_me_details_of",
-           "get_version_of",
-           "what_is_the_default_browser"]
+           "get_version_of"]
 
 
-# get installed browsers
+# get all installed browsers
 def browsers() -> Iterator[Browser]:
     """
-    Iterates over installed browsers.
+    Iterates over installed browsers.\n
+    Locally installed browser versions (portable) are not considered.
 
-    :return: Iterator of Tuple of browser key and browser information.
+    :return: Iterator of dictionary of browser key and information.
     """
     match sys.platform:
         case OS.LINUX:
@@ -37,7 +38,7 @@ def what_is_the_default_browser():
     """
     Shows the default browser in system - if there is any.
 
-    :return: Default browser information.
+    :return: Default browser description.
     """
     match sys.platform:
         case OS.LINUX:
@@ -56,15 +57,15 @@ def do_i_have_installed(name: str):
     Parameters:
                 Possible browser entries / parameters\n
                 for Linux:\n
-                chrome, chromium, firefox, ms-edge, opera, opera-beta, opera-developer,
+                chrome, chromium, firefox, opera, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev
                 brave, brave-beta, brave-nightly\n
                 for macOS:\n
                 chrome, chrome-canary, chromium, firefox, firefox-developer, firefox-nightly,
-                safari, opera, opera-beta, opera-developer, ms-edge, ms-edge-beta, ms-edge-dev, ms-edge-canary,
-                brave, brave-beta, brave-dev, brave-nightly\n
+                safari, opera, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev, msedge-canary,
+                brave, brave-beta, brave-nightly\n
                 for Windows:\n
                 chrome, chrome-canary, chromium, firefox, firefox-developer, firefox-nightly,
-                opera, opera-beta, opera-developer, ms-edge, ms-edge-beta, ms-edge-dev, ms-edge-canary, ms-ie,
+                opera-stable, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev, msedge-canary, msie,
                 brave, brave-beta, brave-nightly
     :return: True or False depending on the browser is installed or not.
     """
@@ -80,20 +81,24 @@ def do_i_have_installed(name: str):
 # retrieve browser details
 def give_me_details_of(name: str) -> Optional[Browser | str]:
     """
-    Retrieve browser details if the provided browser is installed in system.
+    Retrieve browser details if the provided browser is installed in system.\n
+    Browser details are: name\n
+                         description\n
+                         version\n
+                         location\n
 
     Parameters:
                 Possible browser entries / parameters\n
                 for Linux:\n
-                chrome, chromium, firefox, ms-edge, opera, opera-beta, opera-developer,
+                chrome, chromium, firefox, opera, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev
                 brave, brave-beta, brave-nightly\n
                 for macOS:\n
                 chrome, chrome-canary, chromium, firefox, firefox-developer, firefox-nightly,
-                safari, opera, opera-beta, opera-developer, ms-edge, ms-edge-beta, ms-edge-dev, ms-edge-canary,
-                brave, brave-beta, brave-dev, brave-nightly\n
+                safari, opera, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev, msedge-canary,
+                brave, brave-beta, brave-nightly\n
                 for Windows:\n
                 chrome, chrome-canary, chromium, firefox, firefox-developer, firefox-nightly,
-                opera, opera-beta, opera-developer, ms-edge, ms-edge-beta, ms-edge-dev, ms-edge-canary, ms-ie,
+                opera-stable, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev, msedge-canary, msie,
                 brave, brave-beta, brave-nightly
     :return: Dictionary containing browser name, description, desktop version and location.
     """
@@ -119,15 +124,15 @@ def get_version_of(name: str) -> Optional[Version | str]:
     Parameters:
                 Possible browser entries / parameters\n
                 for Linux:\n
-                chrome, chromium, firefox, ms-edge, opera, opera-beta, opera-developer,
+                chrome, chromium, firefox, opera, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev
                 brave, brave-beta, brave-nightly\n
                 for macOS:\n
                 chrome, chrome-canary, chromium, firefox, firefox-developer, firefox-nightly,
-                safari, opera, opera-beta, opera-developer, ms-edge, ms-edge-beta, ms-edge-dev, ms-edge-canary,
-                brave, brave-beta, brave-dev, brave-nightly\n
+                safari, opera, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev, msedge-canary,
+                brave, brave-beta, brave-nightly\n
                 for Windows:\n
                 chrome, chrome-canary, chromium, firefox, firefox-developer, firefox-nightly,
-                opera, opera-beta, opera-developer, ms-edge, ms-edge-beta, ms-edge-dev, ms-edge-canary, ms-ie,
+                opera-stable, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev, msedge-canary, msie,
                 brave, brave-beta, brave-nightly
     :return: Browser description and version.
     """

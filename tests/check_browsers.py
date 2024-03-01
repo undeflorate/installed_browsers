@@ -17,7 +17,7 @@ For proper working, make sure that either stable or beta version is installed bu
 """
 
 # constant declaration
-DEFAULT_BROWSER_LINUX = "firefox_firefox.desktop"
+DEFAULT_BROWSER_LINUX = "Firefox Web Browser"
 DEFAULT_BROWSER_MAC = "Firefox"
 BROWSER_FIREFOX = "Mozilla Firefox"
 BROWSER_CHROME_CANARY = "Google Chrome Canary"
