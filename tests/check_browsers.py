@@ -110,7 +110,8 @@ def test_os_is_not_supported():
 @patch.dict("sys.modules", winreg=MockWinreg)
 @patch('winreg.QueryValueEx')
 @patch('winreg.QueryValue')
-def test_default_browser(mock_winreg_qv, mock_winreg_qve, mock_subprocess_get, mock_subprocess_check, mock_load, browser):
+def test_default_browser(mock_winreg_qv, mock_winreg_qve, mock_subprocess_get,
+                         mock_subprocess_check, mock_load, browser):
     match sys.platform:
         case OS.LINUX:
             mock_subprocess_check.return_value = browser

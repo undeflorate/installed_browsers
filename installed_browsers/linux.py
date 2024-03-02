@@ -62,7 +62,7 @@ def browsers() -> Iterator[Browser]:
 def what_is_the_default_browser() -> Optional[str]:
     cmd = "xdg-settings get default-web-browser".split()
     default_browser = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip()
-    if not default_browser:
+    if not default_browser or default_browser is None:
         default_browser = "No browser is set to default."
     else:
         default_browser = _get_browser_description(default_browser)
