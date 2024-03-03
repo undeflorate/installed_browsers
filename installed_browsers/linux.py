@@ -144,5 +144,5 @@ def _get_browser_description(desktop_name):
         if not os.path.isfile(path):
             continue
         entry = DesktopEntry(path)
-        print(entry)
+        print(entry.getName())
         return entry.getName()
