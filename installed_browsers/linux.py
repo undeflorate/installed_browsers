@@ -62,8 +62,6 @@ def browsers() -> Iterator[Browser]:
 def what_is_the_default_browser() -> Optional[str]:
     cmd = "xdg-settings get default-web-browser".split()
     try:
-        print("first", subprocess.check_output(cmd, stderr=subprocess.DEVNULL))
-        print("second", subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode())
         default_browser = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip()
     except subprocess.CalledProcessError:
         default_browser = "No browser is set to default."
@@ -139,10 +137,7 @@ def get_version_of(name) -> Optional[Version]:
 def _get_browser_description(desktop_name):
     for application_dir in BROWSER_LOCATIONS:
         path = os.path.join(application_dir, desktop_name)
-        print(path)
-        print(os.path.isfile(path))
         if not os.path.isfile(path):
             continue
         entry = DesktopEntry(path)
-        print(entry.getName())
         return entry.getName()
