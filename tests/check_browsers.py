@@ -106,15 +106,19 @@ def test_os_is_not_supported():
 )
 @patch("plistlib.load")
 @patch("subprocess.check_output")
+@patch("os.path.isfile")
+@patch("xdg.desktopentry")
 @patch("subprocess.getoutput")
 @patch.dict("sys.modules", winreg=MockWinreg)
 @patch('winreg.QueryValueEx')
 @patch('winreg.QueryValue')
 def test_default_browser(mock_winreg_qv, mock_winreg_qve, mock_subprocess_get,
-                         mock_subprocess_check, mock_load, browser):
+                         mock_desktopentry, mock_isfile, mock_subprocess_check, mock_load, browser):
     match sys.platform:
         case OS.LINUX:
             mock_subprocess_check.return_value = browser
+            mock_isfile.return_value = True
+            mock_desktopentry.return_value = {"Name": "Firefox Web Browser"}
             assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_LINUX
         case OS.MAC:
             mock_load.side_effect = [browser, {'CFBundleExecutable': 'firefox'}]
