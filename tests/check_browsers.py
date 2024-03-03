@@ -107,7 +107,7 @@ def test_os_is_not_supported():
 @patch("plistlib.load")
 @patch("subprocess.check_output")
 @patch("os.path.isfile")
-@patch("xdg.desktopentry")
+@patch("xdg.Desktopentry.Desktopentry")
 @patch("subprocess.getoutput")
 @patch.dict("sys.modules", winreg=MockWinreg)
 @patch('winreg.QueryValueEx')
