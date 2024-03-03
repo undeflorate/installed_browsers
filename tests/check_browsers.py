@@ -118,7 +118,7 @@ def test_default_browser(mock_winreg_qv, mock_winreg_qve, mock_subprocess_get,
         case OS.LINUX:
             mock_subprocess_check.return_value = browser
             mock_isfile.return_value = True
-            mock_desktopentry.return_value = {"Name": "Firefox Web Browser"}
+            # mock_desktopentry.return_value = {"Name": "Firefox Web Browser"}
             assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_LINUX
         case OS.MAC:
             mock_load.side_effect = [browser, {'CFBundleExecutable': 'firefox'}]
