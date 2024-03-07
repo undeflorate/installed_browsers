@@ -284,7 +284,6 @@ def _get_browser_version_from_registry(tree: int, access: int, name: str) -> Opt
 
 # determine browser version
 def _create_browser_version(path: str) -> str:
-    import win32api
     info = win32api.GetFileVersionInfo(path, "\\")
     ms = info["FileVersionMS"]
     ls = info["FileVersionLS"]
