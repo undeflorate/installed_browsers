@@ -89,6 +89,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest pytest-cov pyxdg pypiwin32
+        python Scripts/pywin32_postinstall.py -install
         pip list
     - name: Lint with flake8
       run: |
