@@ -40,40 +40,57 @@ match sys.platform:
 @pytest.mark.parametrize(
     "browser",
     (
-        pytest.param("chrome", id="chrome"),
-        pytest.param("chromium", id="chromium"),
-        pytest.param("firefox", id="firefox"),
-        pytest.param("safari", id="safari",
+        pytest.param(["chrome", "Google Chrome"], id="chrome"),
+        pytest.param(["chromium", "Chromium"], id="chromium"),
+        pytest.param(["firefox", "Mozilla Firefox"], id="firefox"),
+        pytest.param(["safari", "Safari"], id="safari",
                      marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")),
         pytest.param(
-            "msedge", id="msedge",
+            ["msedge", "Microsoft Edge"], id="msedge",
             marks=pytest.mark.skipif(sys.platform == "linux", reason="mac-and-windows-only")
         ),
-        pytest.param("msie", id="msie",
+        pytest.param(["msie", "Internet Explorer"], id="msie",
                      marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")),
-        pytest.param("dummy_browser", id="dummy_browser"),
+        pytest.param(["dummy_browser", "Dummy Browser"], id="dummy_browser"),
     ),
 )
 class TestBrowserInstallation:
     def test_installed_browsers(self, browser: str):
         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
-        if browser in available_browsers:
-            assert browser in available_browsers
+        if browser[0] in available_browsers:
+            assert browser[0] in available_browsers
         else:
-            assert browser not in available_browsers
+            assert browser[0] not in available_browsers
 
     @patch("installed_browsers.browsers")
-    def test_browser_is_installed_or_not(self, mock_browsers, browser: str):
+    @patch("winreg.QueryValue")
+    def test_browser_is_installed_or_not(self, mock_query_value, mock_browsers, browser: str):
         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
-        print(installed_browsers.do_i_have_installed("chromium"), "chromium")
         match sys.platform:
             case OS.WINDOWS:
-                mock_browsers.return_value = list(browser)
-        if browser in available_browsers:
-            assert installed_browsers.do_i_have_installed(browser)
-        else:
-            print(installed_browsers.do_i_have_installed(browser))
-            assert not installed_browsers.do_i_have_installed(browser)
+                mock_query_value.return_value = browser[1]
+                if browser[0] in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
+                    assert installed_browsers.do_i_have_installed(browser[0])
+                else:
+                    assert not installed_browsers.do_i_have_installed(browser[0])
+            case _:
+                if browser[0] in available_browsers:
+                    assert installed_browsers.do_i_have_installed(browser[0])
+                else:
+                    assert not installed_browsers.do_i_have_installed(browser[0])
+        # if browser == "chrome":
+        #
+        #     match sys.platform:
+        #         case OS.WINDOWS:
+        #             # mock_browsers.return_value = [{"name": "chrome"}, {"description": "Google Chrome"}, {"version": ANY}, {"location": ANY}]
+        #             mock_browsers.return_value = ["chrome"]
+        #     available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
+        #     print(installed_browsers.do_i_have_installed("chromium"), "chromium")
+        #     if browser in available_browsers:
+        #         assert installed_browsers.do_i_have_installed(browser)
+        #     else:
+        #         print(installed_browsers.do_i_have_installed(browser))
+        #         assert not installed_browsers.do_i_have_installed(browser)
 
 
 # only linux, mac and windows operating systems are supported
