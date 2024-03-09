@@ -64,12 +64,12 @@ class TestBrowserInstallation:
 
     def test_browser_is_installed_or_not(self, browser: str):
         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
+        for inst in installed_browsers.browsers():
+            print(inst)
         if browser in available_browsers:
             assert installed_browsers.do_i_have_installed(browser)
         else:
             print(installed_browsers.do_i_have_installed(browser))
-            for inst in installed_browsers.browsers():
-                print(inst)
             assert not installed_browsers.do_i_have_installed(browser)
 
 
