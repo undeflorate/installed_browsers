@@ -68,6 +68,7 @@ class TestBrowserInstallation:
         print(installed_browsers.do_i_have_installed("firefox"))
         print(installed_browsers.do_i_have_installed("msedge"))
         print(installed_browsers.do_i_have_installed("safari"))
+        print(installed_browsers.do_i_have_installed("chromium"), "chromium")
         if browser in available_browsers:
             assert installed_browsers.do_i_have_installed(browser)
         else:
