@@ -57,7 +57,6 @@ match sys.platform:
 class TestBrowserInstallation:
     def test_installed_browsers(self, browser: str):
         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
-        print(available_browsers)
         if browser in available_browsers:
             assert browser in available_browsers
         else:
@@ -65,6 +64,10 @@ class TestBrowserInstallation:
 
     def test_browser_is_installed_or_not(self, browser: str):
         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
+        print(installed_browsers.do_i_have_installed("chrome"))
+        print(installed_browsers.do_i_have_installed("firefox"))
+        print(installed_browsers.do_i_have_installed("msedge"))
+        print(installed_browsers.do_i_have_installed("safari"))
         if browser in available_browsers:
             assert installed_browsers.do_i_have_installed(browser)
         else:
