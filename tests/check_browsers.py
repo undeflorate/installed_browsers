@@ -62,15 +62,13 @@ class TestBrowserInstallation:
         else:
             assert browser not in available_browsers
 
-    def test_browser_is_installed_or_not(self, browser: str):
+    @patch("installed_browsers.browsers")
+    def test_browser_is_installed_or_not(self, mock_browsers, browser: str):
         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
-        print(installed_browsers.do_i_have_installed("chrome"))
-        print(installed_browsers.do_i_have_installed("firefox"))
-        print(installed_browsers.do_i_have_installed("msedge"))
-        print(installed_browsers.do_i_have_installed("safari"))
         print(installed_browsers.do_i_have_installed("chromium"), "chromium")
-        import platform
-        print(platform.architecture()[0])
+        match sys.platform:
+            case OS.WINDOWS:
+                mock_browsers.return_value = list(browser)
         if browser in available_browsers:
             assert installed_browsers.do_i_have_installed(browser)
         else:

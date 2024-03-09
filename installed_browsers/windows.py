@@ -337,8 +337,6 @@ def _get_unique_browsers(winreg_key) -> Iterator[Browser]:
     # filter for unique browsers
     for browser_local_machine in browsers_local_machine:
         for duplicate in duplicates:
-            print(duplicate)
-            print(browser_local_machine)
             if duplicate == browser_local_machine:
                 browser_local_machine.clear()
                 break
