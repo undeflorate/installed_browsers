@@ -67,6 +67,7 @@ class TestBrowserInstallation:
         if browser in available_browsers:
             assert installed_browsers.do_i_have_installed(browser)
         else:
+            print(installed_browsers.do_i_have_installed(browser))
             assert not installed_browsers.do_i_have_installed(browser)
 
 
