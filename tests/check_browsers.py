@@ -36,87 +36,48 @@ match sys.platform:
         MockWinreg = winreg
 
 
-# # check if given browser is installed in system
-# @pytest.mark.parametrize(
-#     "browser",
-#     (
-#         pytest.param("chrome", id="chrome",
-#                      marks=pytest.mark.skipif(sys.platform == "win32", reason="linux-and-mac-only")),
-#         pytest.param("chromium", id="chromium",
-#                      marks=pytest.mark.skipif(sys.platform == "win32", reason="linux-and-mac-only")),
-#         pytest.param("firefox", id="firefox",
-#                      marks=pytest.mark.skipif(sys.platform == "win32", reason="linux-and-mac-only")),
-#         pytest.param("safari", id="safari",
-#                      marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")),
-#         pytest.param(
-#             "msedge", id="msedge",
-#             marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")
-#         ),
-#         pytest.param("dummy_browser", id="dummy_browser",
-#                      marks=pytest.mark.skipif(sys.platform == "win32", reason="linux-and-mac-only")),
-#     ),
-# )
-# class TestBrowserInstallation:
-#     def test_installed_browsers(self, browser: str):
-#         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
-#         if browser in available_browsers:
-#             assert browser in available_browsers
-#         else:
-#             assert browser not in available_browsers
-#
-#     @patch.dict("sys.modules", winreg=MockWinreg)
-#     @patch("winreg.QueryValue")
-#     def test_browser_is_installed_or_not(self, mock_winreg_qv, browser: str):
-#         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
-#         print(installed_browsers.do_i_have_installed("chromium"), "chromium")
-#         if browser in available_browsers:
-#             assert installed_browsers.do_i_have_installed(browser)
-#         else:
-#             assert not installed_browsers.do_i_have_installed(browser)
-
-
 # check if given browser is installed in system
 @pytest.mark.parametrize(
-    "browser",
+    ("browser", "description"),
     (
-        pytest.param(["chrome", "Google Chrome"], id="chrome"),
-        pytest.param(["[chromium", "Chromium"], id="chromium"),
-        pytest.param(["firefox", "Mozilla Firefox"], id="firefox"),
-        pytest.param(["safari", "Safari"], id="safari",
+        pytest.param("chrome", "Google Chrome", id="chrome"),
+        pytest.param("[chromium", "Chromium", id="chromium"),
+        pytest.param("firefox", "Mozilla Firefox", id="firefox"),
+        pytest.param("safari", "Safari", id="safari",
                      marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")),
         pytest.param(
-            ["msedge", "Microsoft Edge"], id="msedge",
+            "msedge", "Microsoft Edge", id="msedge",
             marks=pytest.mark.skipif(sys.platform == "linux", reason="mac-and-windows-only")
         ),
-        pytest.param(["dummy_browser", "Dummy Browser"], id="dummy_browser"),
+        pytest.param("dummy_browser", "Dummy Browser", id="dummy_browser"),
     ),
 )
 class TestBrowserInstallation:
-    def test_installed_browsers(self, browser: str):
+    def test_installed_browsers(self, browser: str, description: str):
         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
-        if browser[0] in available_browsers:
-            assert browser[0] in available_browsers
+        if browser in available_browsers:
+            assert browser in available_browsers
         else:
-            assert browser[0] not in available_browsers
+            assert browser not in available_browsers
 
     @patch.dict("sys.modules", winreg=MockWinreg)
     @patch("winreg.QueryValue")
-    def test_browser_is_installed_or_not(self, mock_winreg_qv, browser: str):
+    def test_browser_is_installed_or_not(self, mock_winreg_qv, browser: str, description: str):
         match sys.platform:
             case OS.LINUX | OS.MAC:
                 available_browsers = [individual_browser["name"] for individual_browser in
                                       installed_browsers.browsers()]
                 print(installed_browsers.do_i_have_installed("chromium"), "chromium")
-                if browser[0] in available_browsers:
-                    assert installed_browsers.do_i_have_installed(browser[0])
+                if browser in available_browsers:
+                    assert installed_browsers.do_i_have_installed(browser)
                 else:
-                    assert not installed_browsers.do_i_have_installed(browser[0])
+                    assert not installed_browsers.do_i_have_installed(browser)
             case OS.WINDOWS:
-                mock_winreg_qv.return_value = browser[1]
-                if browser[0] in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
-                    assert installed_browsers.do_i_have_installed(browser[0])
+                mock_winreg_qv.return_value = description
+                if browser in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
+                    assert installed_browsers.do_i_have_installed(browser)
                 else:
-                    assert not installed_browsers.do_i_have_installed(browser[0])
+                    assert not installed_browsers.do_i_have_installed(browser)
 
 
 # only linux, mac and windows operating systems are supported
@@ -370,12 +331,23 @@ def test_no_default_browser(mock_winreg_qv, mock_winreg_qve, mock_check_output, 
         ),
     ),
 )
-def test_get_browser_details(browser: str, details: Dict):
-    available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
-    if browser in available_browsers:
-        assert installed_browsers.give_me_details_of(browser) == details
-    else:
-        assert installed_browsers.give_me_details_of(browser) == BROWSER_NOT_INSTALLED
+@patch.dict("sys.modules", winreg=MockWinreg)
+@patch("winreg.QueryValue")
+def test_get_browser_details(mock_winreg_qv, browser: str, details: Dict):
+    match sys.platform:
+        case OS.LINUX | OS.MAC:
+            available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
+            if browser in available_browsers:
+                assert installed_browsers.give_me_details_of(browser) == details
+            else:
+                assert installed_browsers.give_me_details_of(browser) == BROWSER_NOT_INSTALLED
+        case OS.WINDOWS:
+            mock_winreg_qv.side_effect = [details["description"], details["location"]]
+            if browser in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
+                assert installed_browsers.do_i_have_installed(browser)
+            else:
+                assert not installed_browsers.do_i_have_installed(browser)
+
 
 
 # check browser version
