@@ -292,7 +292,7 @@ def test_no_default_browser(mock_winreg_qv, mock_winreg_qve, mock_check_output, 
                 "name": "firefox",
                 "description": "Mozilla Firefox",
                 "version": ANY,
-                "location": ANY
+                "location": r"C:\Program Files\Mozilla Firefox\firefox.exe",  # ANY
             },
             marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only"),
             id="firefox_windows",
@@ -344,9 +344,9 @@ def test_get_browser_details(mock_winreg_qv, browser: str, details: Dict):
         case OS.WINDOWS:
             mock_winreg_qv.side_effect = [details["description"], details["location"]]
             if browser in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
-                assert installed_browsers.do_i_have_installed(browser)
+                assert installed_browsers.give_me_details_of(browser) == details
             else:
-                assert not installed_browsers.do_i_have_installed(browser)
+                assert installed_browsers.give_me_details_of(browser) == BROWSER_NOT_INSTALLED
 
 
 # check browser version

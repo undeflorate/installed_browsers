@@ -125,8 +125,8 @@ def get_details_of(name) -> Optional[Browser | str]:
         browser_name = POSSIBLE_BROWSER_NAMES[browser]
 
         yield _get_browser_details_from_registry(winreg.HKEY_CURRENT_USER, winreg.KEY_READ, browser_name)
-        match platform.architecture()[0]:
-            case OS.WIN32:  # pragma: no cover
+        match platform.architecture()[0]:   # pragma: no cover
+            case OS.WIN32:
                 yield _get_browser_details_from_registry(
                     winreg.HKEY_LOCAL_MACHINE, winreg.KEY_READ | winreg.KEY_WOW64_32KEY, browser_name)
             case OS.WIN64:
@@ -244,7 +244,7 @@ def _get_browser_details_from_registry(tree: int, access: int, name: str) -> Opt
                         location=cmd
                     )
                 else:
-                    continue
+                    continue    # pragma: no cover
     except FileNotFoundError:   # pragma: no cover
         pass
 
