@@ -40,49 +40,73 @@ match sys.platform:
 @pytest.mark.parametrize(
     "browser",
     (
-        pytest.param(["chrome", "Google Chrome"], id="chrome"),
-        pytest.param(["chromium", "Chromium"], id="chromium"),
-        pytest.param(["firefox", "Mozilla Firefox"], id="firefox"),
-        pytest.param(["safari", "Safari"], id="safari",
+        pytest.param("chrome", id="chrome",
+                     marks=pytest.mark.skipif(sys.platform == "win32", reason="linux-and-mac-only")),
+        pytest.param("chromium", id="chromium",
+                     marks=pytest.mark.skipif(sys.platform == "win32", reason="linux-and-mac-only")),
+        pytest.param("firefox", id="firefox",
+                     marks=pytest.mark.skipif(sys.platform == "win32", reason="linux-and-mac-only")),
+        pytest.param("safari", id="safari",
                      marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")),
         pytest.param(
-            ["msedge", "Microsoft Edge"], id="msedge",
-            marks=pytest.mark.skipif(sys.platform == "linux", reason="mac-and-windows-only")
+            "msedge", id="msedge",
+            marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")
         ),
-        pytest.param(["msie", "Internet Explorer"], id="msie",
-                     marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")),
-        pytest.param(["dummy_browser", "Dummy Browser"], id="dummy_browser"),
+        pytest.param("dummy_browser", id="dummy_browser",
+                     marks=pytest.mark.skipif(sys.platform == "win32", reason="linux-and-mac-only")),
     ),
 )
 class TestBrowserInstallation:
     def test_installed_browsers(self, browser: str):
         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
-        if browser[0] in available_browsers:
-            assert browser[0] in available_browsers
+        if browser in available_browsers:
+            assert browser in available_browsers
         else:
-            assert browser[0] not in available_browsers
+            assert browser not in available_browsers
 
     @patch("winreg.QueryValue")
     def test_browser_is_installed_or_not(self, mock_winreg_qv, browser: str):
         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
-        match sys.platform:
-            case OS.WINDOWS:
-                mock_winreg_qv.return_value = browser[1]
-                if browser[0] in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
-                    assert installed_browsers.do_i_have_installed(browser[0])
-                else:
-                    assert not installed_browsers.do_i_have_installed(browser[0])
-            case _:
-                if browser[0] in available_browsers:
-                    assert installed_browsers.do_i_have_installed(browser[0])
-                else:
-                    assert not installed_browsers.do_i_have_installed(browser[0])
-        #     available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
-        #     print(installed_browsers.do_i_have_installed("chromium"), "chromium")
-        #     if browser in available_browsers:
-        #         assert installed_browsers.do_i_have_installed(browser)
-        #     else:
-        #         assert not installed_browsers.do_i_have_installed(browser)
+        print(installed_browsers.do_i_have_installed("chromium"), "chromium")
+        if browser in available_browsers:
+            assert installed_browsers.do_i_have_installed(browser)
+        else:
+            assert not installed_browsers.do_i_have_installed(browser)
+
+
+# check if given browser is installed in system
+@pytest.mark.parametrize(
+    "browser",
+    (
+        pytest.param(["chrome", "Google Chrome"], id="chrome",
+                     marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")),
+        pytest.param(["chromium", "Chromium"], id="chromium",
+                     marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")),
+        pytest.param(["firefox", "Mozilla Firefox"], id="firefox",
+                     marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")),
+        pytest.param(
+            ["msedge", "Microsoft Edge"], id="msedge",
+            marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")
+        ),
+        pytest.param(["msie", "Internet Explorer"], id="msie",
+                     marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")),
+        pytest.param(["dummy_browser", "Dummy Browser"], id="dummy_browser",
+                     marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")),
+    ),
+)
+@patch("winreg.QueryValue")
+def test_browser_is_installed_or_not_on_windows(mock_winreg_qv, browser: str):
+    mock_winreg_qv.return_value = browser[1]
+    if browser[0] in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
+        assert installed_browsers.do_i_have_installed(browser[0])
+    else:
+        assert not installed_browsers.do_i_have_installed(browser[0])
+    #     available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
+    #     print(installed_browsers.do_i_have_installed("chromium"), "chromium")
+    #     if browser in available_browsers:
+    #         assert installed_browsers.do_i_have_installed(browser)
+    #     else:
+    #         assert not installed_browsers.do_i_have_installed(browser)
 
 
 # only linux, mac and windows operating systems are supported
