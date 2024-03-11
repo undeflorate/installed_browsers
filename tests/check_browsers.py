@@ -137,15 +137,8 @@ class TestBrowserInstallation2:
     @patch.dict("sys.modules", winreg=MockWinreg)
     @patch("winreg.QueryValue")
     def test_browser_is_installed_or_not(self, mock_winreg_qv, browser: str):
-        # available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
         match sys.platform:
-            case OS.WINDOWS:
-                mock_winreg_qv.return_value = browser[1]
-                if browser[0] in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
-                    assert installed_browsers.do_i_have_installed(browser[0])
-                else:
-                    assert not installed_browsers.do_i_have_installed(browser[0])
-            case _:
+            case OS.LINUX | OS.MAC:
                 available_browsers = [individual_browser["name"] for individual_browser in
                                       installed_browsers.browsers()]
                 print(installed_browsers.do_i_have_installed("chromium"), "chromium")
@@ -153,6 +146,12 @@ class TestBrowserInstallation2:
                     assert installed_browsers.do_i_have_installed(browser)
                 else:
                     assert not installed_browsers.do_i_have_installed(browser)
+            case OS.WINDOWS:
+                mock_winreg_qv.return_value = browser[1]
+                if browser[0] in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
+                    assert installed_browsers.do_i_have_installed(browser[0])
+                else:
+                    assert not installed_browsers.do_i_have_installed(browser[0])
 
 
 # only linux, mac and windows operating systems are supported
