@@ -142,10 +142,10 @@ class TestBrowserInstallation2:
                 available_browsers = [individual_browser["name"] for individual_browser in
                                       installed_browsers.browsers()]
                 print(installed_browsers.do_i_have_installed("chromium"), "chromium")
-                if browser in available_browsers:
-                    assert installed_browsers.do_i_have_installed(browser)
+                if browser[0] in available_browsers:
+                    assert installed_browsers.do_i_have_installed(browser[0])
                 else:
-                    assert not installed_browsers.do_i_have_installed(browser)
+                    assert not installed_browsers.do_i_have_installed(browser[0])
             case OS.WINDOWS:
                 mock_winreg_qv.return_value = browser[1]
                 if browser[0] in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
