@@ -64,6 +64,7 @@ class TestBrowserInstallation:
         else:
             assert browser not in available_browsers
 
+    @patch.dict("sys.modules", winreg=MockWinreg)
     @patch("winreg.QueryValue")
     def test_browser_is_installed_or_not(self, mock_winreg_qv, browser: str):
         available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
