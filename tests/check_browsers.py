@@ -349,7 +349,6 @@ def test_get_browser_details(mock_winreg_qv, browser: str, details: Dict):
                 assert not installed_browsers.do_i_have_installed(browser)
 
 
-
 # check browser version
 @pytest.mark.parametrize(
     ("browser", "version"),
