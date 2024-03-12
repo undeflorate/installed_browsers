@@ -454,6 +454,16 @@ def test_get_browser_details(mock_winreg_qv, browser: str, details: Dict):
             id="msie_windows",
         ),
         pytest.param(
+            "msedge-canary",
+            "Microsoft Edge Canary",
+            {
+                "version": ANY,
+            },
+            r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+            marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only"),
+            id="msedge_canary_windows",
+        ),
+        pytest.param(
             "dummy_browser",
             "Dummy Browser",
             {
