@@ -351,113 +351,146 @@ def test_get_browser_details(mock_winreg_qv, browser: str, details: Dict):
 
 # check browser version
 @pytest.mark.parametrize(
-    ("browser", "version"),
+    ("browser", "description", "version", "location"),
     (
         pytest.param(
             "chrome",
+            "Google Chrome",
             {
                 "version": ANY,
             },
+            ANY,
             marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only"),
             id="chrome_mac",
         ),
         pytest.param(
             "firefox",
+            "Firefox",
             {
                 "version": ANY,
             },
+            ANY,
             marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only"),
             id="firefox_mac",
         ),
         pytest.param(
             "safari",
+            "Safari",
             {
                 "version": ANY,
             },
+            ANY,
             marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only"),
             id="safari_mac",
         ),
         pytest.param(
             "msedge",
+            "Microsoft Edge",
             {
                 "version": ANY,
             },
+            r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
             marks=pytest.mark.skipif(sys.platform == "linux", reason="mac-and-windows-only"),
             id="msedge_mac_windows",
         ),
         pytest.param(
             "chrome",
+            "Google Chrome",
             {
                 "version": ANY,
             },
+            ANY,
             marks=pytest.mark.skipif(sys.platform != "linux", reason="linux-only"),
             id="chrome_linux",
         ),
         pytest.param(
             "chromium",
+            "Chromium",
             {
                 "version": ANY,
             },
+            ANY,
             marks=pytest.mark.skipif(sys.platform != "linux", reason="linux-only"),
             id="chromium_linux",
         ),
         pytest.param(
             "firefox",
+            "Mozilla Firefox",
             {
                 "version": ANY,
             },
+            ANY,
             marks=pytest.mark.skipif(sys.platform != "linux", reason="linux-only"),
             id="firefox_linux",
         ),
         pytest.param(
             "chrome",
+            "Google Chrome",
             {
                 "version": ANY,
             },
+            r"C:\Program Files\Google\Chrome\Application\chrome.exe",
             marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only"),
             id="chrome_windows",
         ),
         pytest.param(
             "firefox",
+            "Mozilla Firefox",
             {
                 "version": ANY,
             },
+            r"C:\Program Files\Mozilla Firefox\firefox.exe",
             marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only"),
             id="firefox_windows",
         ),
         pytest.param(
             "msie",
+            "Internet Explorer",
             {
                 "version": ANY,
             },
+            r"C:\Program Files\Internet Explorer\iexplore.exe",
             marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only"),
             id="msie_windows",
         ),
         pytest.param(
             "dummy_browser",
+            "Dummy Browser",
             {
                 "version": ANY,
             },
+            ANY,
             id="dummy_browser",
         ),
     ),
 )
 class TestBrowserVersion:
-    def test_version_of_browser(self, browser: str, version: Dict):
-        available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
-        if browser in available_browsers:
-            assert installed_browsers.get_version_of(browser) == version
+    @patch.dict("sys.modules", winreg=MockWinreg)
+    @patch("winreg.QueryValue")
+    def test_version_of_browser(self, mock_winreg_qv, browser: str, description: str, version: Dict, location: str):
+        match sys.platform:
+            case OS.LINUX | OS.MAC:
+                available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
+                if browser in available_browsers:
+                    assert installed_browsers.get_version_of(browser) == version
+            case OS.WINDOWS:
+                mock_winreg_qv.side_effect = [description, location]
+                if browser in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
+                    assert installed_browsers.get_version_of(browser) == version
+                else:
+                    assert installed_browsers.get_version_of(browser) == BROWSER_NOT_INSTALLED
 
     @patch("subprocess.getoutput")
     @patch("os.path.isfile")
     @patch.dict("sys.modules", winreg=MockWinreg)
     @patch("winreg.QueryValue")
-    def test_version_not_determined(self, mock_winreg, mock_file, mock_output, browser: str, version: Dict) -> None:
+    def test_version_not_determined(self, mock_winreg_qv, mock_file, mock_output, browser: str,
+                                    description: str, version: Dict, location: str) -> None:
         match sys.platform:
             case OS.LINUX:
                 mock_file.return_value = False
             case OS.MAC:
                 mock_output.return_value = ""
             case OS.WINDOWS:
-                mock_winreg.return_value = "dummy"
+                mock_winreg_qv.return_value = "dummy"
         assert installed_browsers.get_version_of(browser) == BROWSER_NOT_INSTALLED

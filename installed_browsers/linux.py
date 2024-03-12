@@ -63,7 +63,7 @@ def what_is_the_default_browser() -> Optional[str]:
     cmd = "xdg-settings get default-web-browser".split()
     try:
         default_browser = subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip()
-    except subprocess.CalledProcessError:
+    except subprocess.CalledProcessError:   # pragma: no cover
         default_browser = "No browser is set to default."
     if not default_browser:
         default_browser = "No browser is set to default."
