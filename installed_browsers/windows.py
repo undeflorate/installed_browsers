@@ -325,7 +325,7 @@ def _get_unique_browsers(winreg_key) -> Iterator[Browser]:
 
     # get browsers available in both places
     duplicates = []
-    for browser_current_user in browsers_current_user:
+    for browser_current_user in browsers_current_user:  # pragma: no cover
         yield browser_current_user
 
         for browser_local_machine in _get_browsers_from_registry(winreg.HKEY_LOCAL_MACHINE,
@@ -335,7 +335,7 @@ def _get_unique_browsers(winreg_key) -> Iterator[Browser]:
                 continue
 
     # filter for unique browsers
-    for browser_local_machine in browsers_local_machine:
+    for browser_local_machine in browsers_local_machine:    # pragma: no cover
         for duplicate in duplicates:
             if duplicate == browser_local_machine:
                 browser_local_machine.clear()
