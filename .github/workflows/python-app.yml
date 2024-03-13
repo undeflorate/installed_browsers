@@ -23,14 +23,9 @@ jobs:
           - os: ubuntu-latest
             pip-cache: ~/.cache/pip
             poetry-cache: ~/.cache/pypoetry
-            build: false
 #          - os: macos-latest
 #            pip-cache: ~/Library/Caches/pip
 #            poetry-cache: ~/Library/Caches/pypoetry
-#          - os: windows-latest
-#            pip-cache: ~\AppData\Local\pip\Cache
-#            poetry-cache: ~\AppData\Local\pypoetry\Cache
-#            build: true
 
     steps:
     - uses: actions/checkout@v4
@@ -63,14 +58,13 @@ jobs:
           - os: windows-latest
             pip-cache: ~\AppData\Local\pip\Cache
             poetry-cache: ~\AppData\Local\pypoetry\Cache
-            build: true
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies #python Scripts/pywin32_postinstall.py -install
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest pytest-cov pyxdg pywin32 pywin32-ctypes

@@ -243,8 +243,8 @@ def _get_browser_details_from_registry(tree: int, access: int, name: str) -> Opt
                         version=_create_browser_version(cmd),
                         location=cmd
                     )
-                else:
-                    continue    # pragma: no cover
+                # else:
+                #     continue    # pragma: no cover
     except FileNotFoundError:   # pragma: no cover
         pass
 
@@ -276,8 +276,8 @@ def _get_browser_version_from_registry(tree: int, access: int, name: str) -> Opt
                     yield Version(
                         version=_create_browser_version(cmd),
                     )
-                else:
-                    continue
+                # else:
+                #     continue
     except FileNotFoundError:   # pragma: no cover
         pass
 
