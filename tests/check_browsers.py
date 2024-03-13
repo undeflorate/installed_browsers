@@ -3,6 +3,7 @@ from typing import Dict
 from unittest.mock import ANY
 from unittest.mock import Mock
 from unittest.mock import patch
+from pathlib import Path
 
 import pytest
 
@@ -133,7 +134,8 @@ def test_default_browser(mock_winreg_qv, mock_winreg_qve, mock_subprocess_get,
         case OS.MAC:
             mock_load.side_effect = [browser, {'CFBundleExecutable': 'firefox'}]
             mock_subprocess_get.return_value = '/Applications/Firefox.app'
-            assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_MAC
+            with patch.object(Path, "open") as mock_open:
+                assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_MAC
         case OS.WINDOWS:
             if browser == BROWSER_FIREFOX:
                 mock_winreg_qve.return_value = ["FirefoxURL-308046B0AF4A39CB"]
