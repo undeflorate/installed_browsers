@@ -134,7 +134,7 @@ def test_default_browser(mock_winreg_qv, mock_winreg_qve, mock_subprocess_get,
         case OS.MAC:
             mock_load.side_effect = [browser, {'CFBundleExecutable': 'firefox'}]
             mock_subprocess_get.return_value = '/Applications/Firefox.app'
-            with patch.object(Path, "open") as mock_open:
+            with patch.object(Path, "open"):
                 assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_MAC
         case OS.WINDOWS:
             if browser == BROWSER_FIREFOX:
@@ -189,8 +189,9 @@ def test_no_default_browser(mock_winreg_qv, mock_winreg_qve, mock_check_output, 
         case OS.LINUX:
             mock_check_output.return_value = browser
         case OS.MAC:
-            with patch.object(Path, "open"):
-                mock_load.side_effect = [browser, {'CFBundleExecutable': ''}]
+            with patch.object(Path, "open") as mock_open:
+                mock_open.return_value = ""
+            mock_load.side_effect = [browser, {'CFBundleExecutable': ''}]
         case OS.WINDOWS:
             mock_winreg_qve.return_value = browser
             mock_winreg_qv.return_value = ""
