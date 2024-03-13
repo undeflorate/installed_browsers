@@ -189,9 +189,10 @@ def test_no_default_browser(mock_winreg_qv, mock_winreg_qve, mock_check_output, 
         case OS.LINUX:
             mock_check_output.return_value = browser
         case OS.MAC:
-            with patch.object(Path, "open") as mock_open:
-                mock_open.return_value = ""
             mock_load.side_effect = [browser, {'CFBundleExecutable': ''}]
+            with patch.object(Path, "open"):
+                assert installed_browsers.what_is_the_default_browser() == NO_DEFAULT_BROWSER
+                return
         case OS.WINDOWS:
             mock_winreg_qve.return_value = browser
             mock_winreg_qv.return_value = ""
