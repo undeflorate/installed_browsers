@@ -137,7 +137,6 @@ def get_version_of(name) -> Optional[Version]:
 def _get_browser_description(desktop_name):
     for application_dir in BROWSER_LOCATIONS:
         path = os.path.join(application_dir, desktop_name)
-        if not os.path.isfile(path):
-            continue
-        entry = DesktopEntry(path)
-        return entry.getName()
+        if os.path.isfile(path):
+            entry = DesktopEntry(path)
+            return entry.getName()
