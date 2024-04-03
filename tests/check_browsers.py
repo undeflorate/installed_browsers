@@ -1,9 +1,9 @@
 import sys
+from pathlib import Path
 from typing import Dict
 from unittest.mock import ANY
 from unittest.mock import Mock
 from unittest.mock import patch
-from pathlib import Path
 
 import pytest
 
@@ -11,18 +11,15 @@ import installed_browsers
 from installed_browsers.common import OS
 
 """
-These tests are based on which browsers exist in GitHub Actions virtual environments.
-For Firefox in Mac, system can not make any difference between stable and beta version other than the application name.
-Beta version is not supported officially.
-For proper working, make sure that either stable or beta version is installed but not both.
+These tests are based on the existing browsers of GitHub Actions virtual environments.
 """
 
 # constant declaration
 DEFAULT_BROWSER_LINUX = "Firefox Web Browser"
 DEFAULT_BROWSER_MAC = "Firefox"
-BROWSER_FIREFOX = "Mozilla Firefox"
-BROWSER_CHROME_CANARY = "Google Chrome Canary"
-BROWSER_EDGE = "Microsoft Edge"
+DEFAULT_BROWSER_WINDOWS_FIREFOX = "Mozilla Firefox"
+DEFAULT_BROWSER_WINDOWS_CHROME_CANARY = "Google Chrome Canary"
+DEFAULT_BROWSER_WINDOWS_EDGE = "Microsoft Edge"
 NO_DEFAULT_BROWSER = "No browser is set to default."
 BROWSER_NOT_INSTALLED = "Browser is not installed."
 OPERATING_SYSTEM_NOT_SUPPORTED = "This operating system is not yet supported."
@@ -137,18 +134,18 @@ def test_default_browser(mock_winreg_qv, mock_winreg_qve, mock_subprocess_get,
             with patch.object(Path, "open"):
                 assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_MAC
         case OS.WINDOWS:
-            if browser == BROWSER_FIREFOX:
+            if browser == DEFAULT_BROWSER_WINDOWS_FIREFOX:
                 mock_winreg_qve.return_value = ["FirefoxURL-308046B0AF4A39CB"]
-                mock_winreg_qv.return_value = BROWSER_FIREFOX
-                assert installed_browsers.what_is_the_default_browser() == BROWSER_FIREFOX
-            elif browser == BROWSER_CHROME_CANARY:
+                mock_winreg_qv.return_value = DEFAULT_BROWSER_WINDOWS_FIREFOX
+                assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_WINDOWS_FIREFOX
+            elif browser == DEFAULT_BROWSER_WINDOWS_CHROME_CANARY:
                 mock_winreg_qve.return_value = ["ChromeSSHTM.308046B0AF4A39CB"]
-                mock_winreg_qv.return_value = BROWSER_CHROME_CANARY
-                assert installed_browsers.what_is_the_default_browser() == BROWSER_CHROME_CANARY
-            elif browser == BROWSER_EDGE:
+                mock_winreg_qv.return_value = DEFAULT_BROWSER_WINDOWS_CHROME_CANARY
+                assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_WINDOWS_CHROME_CANARY
+            elif browser == DEFAULT_BROWSER_WINDOWS_EDGE:
                 mock_winreg_qve.return_value = ["MSEdgeHTM"]
-                mock_winreg_qv.return_value = BROWSER_EDGE
-                assert installed_browsers.what_is_the_default_browser() == BROWSER_EDGE
+                mock_winreg_qv.return_value = DEFAULT_BROWSER_WINDOWS_EDGE
+                assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_WINDOWS_EDGE
 
 
 # check missing default browser

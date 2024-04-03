@@ -64,8 +64,8 @@ POSSIBLE_BROWSER_NAMES = dict(
 # constant declaration
 DASH = "-"
 DOT = "."
-FIREFOX = "firefox"
 EXECUTABLE = "exe"
+FIREFOX = "firefox"
 
 
 # get all installed browsers

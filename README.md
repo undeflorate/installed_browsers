@@ -14,7 +14,7 @@ A simple python library to help you identify the installed browsers in your host
 
 ## supported browsers
 + google chrome
-+ google chrome canary
++ google chrome canary [^1]
 + chromium
 + firefox
 + firefox developer [^1]
@@ -30,7 +30,7 @@ A simple python library to help you identify the installed browsers in your host
 + microsoft edge developer
 + brave
 + brave beta
-+ brave developer
++ brave developer  
 [^1]: only for mac and windows
 [^2]: only for mac
 [^3]: only for windows
@@ -41,7 +41,7 @@ A simple python library to help you identify the installed browsers in your host
 
 > [!IMPORTANT]
 > **Firefox beta is not supported** in any of the operating systems as it is almost identical with the stable version.
-> + Beta and stable versions use the same naming convention.
+> + Beta and stable versions use the same naming convention. For proper working, make sure that either stable or beta version is installed but not both.
 > + For mac, you need to add a different application name for beta if you have already installed the stable version previously.  
 > + By default, in windows, beta is installed into a different location than stable: `Application Data`.
 > 
