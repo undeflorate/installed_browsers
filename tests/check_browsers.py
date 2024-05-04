@@ -1,3 +1,4 @@
+import builtins
 import sys
 from pathlib import Path
 from typing import Dict
@@ -131,8 +132,9 @@ def test_default_browser(mock_winreg_qv, mock_winreg_qve, mock_subprocess_get,
         case OS.MAC:
             mock_load.side_effect = [browser, {'CFBundleExecutable': 'firefox'}]
             mock_subprocess_get.return_value = '/Applications/Firefox.app'
-            with patch("builtins.open", mock_open(), create=True):
-                # with patch.object(Path, "open"):
+            # with patch("builtins.open", mock_open(), create=True):
+            # with patch.object(Path, "open"):
+            with patch.object(builtins, "open"):
                 assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_MAC
         case OS.WINDOWS:
             if browser == DEFAULT_BROWSER_WINDOWS_FIREFOX:
