@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 from typing import Dict
-from unittest.mock import ANY
+from unittest.mock import ANY, mock_open
 from unittest.mock import Mock
 from unittest.mock import patch
 
@@ -131,7 +131,7 @@ def test_default_browser(mock_winreg_qv, mock_winreg_qve, mock_subprocess_get,
         case OS.MAC:
             mock_load.side_effect = [browser, {'CFBundleExecutable': 'firefox'}]
             mock_subprocess_get.return_value = '/Applications/Firefox.app'
-            with patch.object(Path, "open") as mock_open:
+            with patch.object(Path, "open", mock_open):
                 # with patch.object(Path, "open"):
                 assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_MAC
         case OS.WINDOWS:
