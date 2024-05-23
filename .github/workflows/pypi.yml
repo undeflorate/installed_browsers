@@ -30,6 +30,6 @@ jobs:
 #          poetry build
 #          poetry config http-basic.pypi ${{ secrets.PYPI_USER }} ${{ secrets.PYPI_PWD }}
 #          poetry build
-      - name: Publish package
-        run: |
-          poetry publish
+#      - name: Publish package
+#        run: |
+#          poetry publish
