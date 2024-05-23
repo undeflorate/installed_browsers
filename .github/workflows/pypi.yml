@@ -23,8 +23,8 @@ jobs:
           pip3 install -U pip setuptools poetry
       - name: Build package
         uses: JRubics/poetry-publish@v2.0
-        with:
-            pypi_token: ${{ secrets.PYPI_TOKEN }}
+#        with:
+#            pypi_token: ${{ secrets.PYPI_TOKEN }}
 #        run: |
 #          poetry config http-basic.pypi ${{ secrets.PYPI_USER }} ${{ secrets.PYPI_PWD }}
 #          poetry build
