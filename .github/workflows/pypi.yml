@@ -14,6 +14,7 @@ jobs:
     environment: production
     permissions:
       id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -25,4 +26,3 @@ jobs:
           pip3 install -U pip setuptools poetry
       - name: Build package
         uses: pypa/gh-action-pypi-publish@release/v1
-
