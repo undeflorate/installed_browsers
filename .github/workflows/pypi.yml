@@ -12,6 +12,8 @@ jobs:
   pypi:
     runs-on: ubuntu-latest
     environment: production
+    permissions:
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
