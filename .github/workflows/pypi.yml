@@ -25,13 +25,4 @@ jobs:
           pip3 install -U pip setuptools poetry
       - name: Build package
         uses: pypa/gh-action-pypi-publish@release/v1
-#        uses: JRubics/poetry-publish@v2.0
-#        with:
-#            pypi_token: ${{ secrets.PYPI_TOKEN }}
-#        run: |
-#          poetry build
-#          poetry config http-basic.pypi ${{ secrets.PYPI_USER }} ${{ secrets.PYPI_PWD }}
-#          poetry build
-#      - name: Publish package
-#        run: |
-#          poetry publish
+
