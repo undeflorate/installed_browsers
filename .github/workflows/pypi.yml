@@ -26,8 +26,9 @@ jobs:
 #        with:
 #            pypi_token: ${{ secrets.PYPI_TOKEN }}
         run: |
-#          poetry config http-basic.pypi ${{ secrets.PYPI_USER }} ${{ secrets.PYPI_PWD }}
           poetry build
+#          poetry config http-basic.pypi ${{ secrets.PYPI_USER }} ${{ secrets.PYPI_PWD }}
+#          poetry build
       - name: Publish package
         run: |
           poetry publish
