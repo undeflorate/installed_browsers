@@ -12,6 +12,8 @@ jobs:
   pypi:
     runs-on: ubuntu-latest
     environment: production
+
+    # IMPORTANT: this permission is mandatory for trusted publishing
     permissions:
       id-token: write
       contents: read
@@ -25,4 +27,7 @@ jobs:
         run: |
           pip3 install -U pip setuptools poetry
       - name: Build package
+        run: |
+          poetry build
+      - name: Publish package
         uses: pypa/gh-action-pypi-publish@release/v1
