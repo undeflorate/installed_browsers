@@ -4,13 +4,19 @@
 name: Publish to TestPyPI
 
 on:
-  push:
-    tags:
-      - '*'
+  release:
+    types:
+      - published
 
 jobs:
-  testpypi:
+  pypi:
     runs-on: ubuntu-latest
+    environment: test
+
+    # IMPORTANT: this permission is mandatory for trusted publishing
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
@@ -22,9 +28,8 @@ jobs:
           pip3 install -U pip setuptools poetry
       - name: Build package
         run: |
-          poetry config repositories.testpypi https://test.pypi.org/legacy/
-          poetry config http-basic.testpypi ${{ secrets.PYPI_USER }} ${{ secrets.PYPI_PWD }}
           poetry build
       - name: Publish package
-        run: |
-          poetry publish -r testpypi
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
