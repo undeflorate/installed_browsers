@@ -21,6 +21,7 @@ DEFAULT_BROWSER_MAC = "Firefox"
 DEFAULT_BROWSER_WINDOWS_FIREFOX = "Mozilla Firefox"
 DEFAULT_BROWSER_WINDOWS_CHROME_CANARY = "Google Chrome Canary"
 DEFAULT_BROWSER_WINDOWS_EDGE = "Microsoft Edge"
+DEFAULT_BROWSER_WINDOWS_MIN = "Min"
 NO_DEFAULT_BROWSER = "No browser is set to default."
 BROWSER_NOT_INSTALLED = "Browser is not installed."
 OPERATING_SYSTEM_NOT_SUPPORTED = "This operating system is not yet supported."
@@ -111,6 +112,10 @@ def test_os_is_not_supported():
             "Google Chrome Canary", id="default_canary_windows",
             marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")
         ),
+        pytest.param(
+            "Min", id="default_min_windows",
+            marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")
+        ),
     ),
 )
 @patch("plistlib.load")
@@ -150,6 +155,10 @@ def test_default_browser(mock_winreg_qv, mock_winreg_qve, mock_subprocess_get,
                 mock_winreg_qve.return_value = ["MSEdgeHTM"]
                 mock_winreg_qv.return_value = DEFAULT_BROWSER_WINDOWS_EDGE
                 assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_WINDOWS_EDGE
+            elif browser == DEFAULT_BROWSER_WINDOWS_MIN:
+                mock_winreg_qve.return_value = ["Min"]
+                mock_winreg_qv.return_value = DEFAULT_BROWSER_WINDOWS_MIN
+                assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_WINDOWS_MIN
 
 
 # check missing default browser

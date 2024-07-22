@@ -36,6 +36,9 @@ POSSIBLE_BROWSERS = {
     "Brave": "brave",
     "Brave Beta": "brave-beta",
     "Brave Nightly": "brave-nightly",
+    "Vivaldi": "vivaldi",
+    "Min": "min",
+    "Pale Moon": "pale-moon",
 }
 
 # dictionary of default browsers
@@ -54,6 +57,9 @@ DEFAULT_BROWSER_DETAILS = {
     "BraveHTML": "Brave",
     "BraveBHTML": "Brave Beta",
     "BraveSSHTM": "Brave Nightly",
+    "VivaldiHTM": "Vivaldi Beta",
+    "Min": "Min",
+    "PaleMoonURL": "Pale Moon"
 }
 
 # dictionary of possible browser names
