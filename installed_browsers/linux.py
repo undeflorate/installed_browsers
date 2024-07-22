@@ -22,7 +22,10 @@ POSSIBLE_BROWSERS = (
     ("msedge-dev", ("microsoft-edge-dev",)),
     ("brave", ("brave-browser", "brave_brave")),
     ("brave-beta", ("brave-browser-beta",)),
-    ("brave-nightly", ("brave-browser-nightly",))
+    ("brave-nightly", ("brave-browser-nightly",)),
+    ("vivaldi-stable", ("vivaldi-stable",)),
+    ("vivaldi-snapshot", ("vivaldi-snapshot",)),
+    ("min", ("min",))
 )
 
 # tuple of browser locations
