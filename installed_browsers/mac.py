@@ -25,6 +25,12 @@ POSSIBLE_BROWSERS = (
     ("brave", "com.brave.Browser", "CFBundleVersion"),
     ("brave-beta", "com.brave.Browser.beta", "CFBundleVersion"),
     ("brave-nightly", "com.brave.Browser.nightly", "CFBundleVersion"),
+    ("vivaldi-stable", "com.vivaldi.Vivaldi", "CFBundleVersion"),
+    ("vivaldi-snapshot", "com.vivaldi.Vivaldi.snapshot", "CFBundleVersion"),
+    ("min", "com.electron.min", "CFBundleVersion"),
+    ("kosmik", "paris.lithium.kosmik", "CFBundleShortVersionString"),
+    ("pale-moon", "org.mozilla.pale*", "CFBundleShortVersionString"),
+    ("arc", "company.thebrowser.Browser", "CFBundleShortVersionString")
 )
 
 
@@ -74,7 +80,13 @@ def what_is_the_default_browser() -> Optional[str]:
         "com.microsoft.edgemac.canary": "Microsoft Edge Canary",
         "com.brave.browser": "Brave Browser",
         "com.brave.browser.beta": "Brave Browser Beta",
-        "com.brave.browser.nightly": "Brave Browser Nightly"
+        "com.brave.browser.nightly": "Brave Browser Nightly",
+        "com.vivaldi.vivaldi": "Vivaldi",
+        "com.vivaldi.vivaldi.snapshot": "Vivaldi Snapshot",
+        "com.electron.min": "Min",
+        "paris.lithium.kosmik": "Kosmik",
+        "org.mozilla.pale moon": "Pale Moon",
+        "company.thebrowser.browser": "Arc"
     }
 
     with PREFERENCES.open("rb") as config_file:
