@@ -57,7 +57,7 @@ DEFAULT_BROWSER_DETAILS = {
     "BraveHTML": "Brave",
     "BraveBHTML": "Brave Beta",
     "BraveSSHTM": "Brave Nightly",
-    "VivaldiHTM": "Vivaldi Beta",
+    "VivaldiHTM": "Vivaldi",
     "Min": "Min",
     "PaleMoonURL": "Pale Moon"
 }

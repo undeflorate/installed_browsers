@@ -30,14 +30,31 @@ A simple python library to help you identify the installed browsers in your host
 + microsoft edge developer
 + brave
 + brave beta
-+ brave developer  
++ brave developer
++ vivaldi [^4]
++ vivaldi snapshot [^4]
++ min
++ arc [^2]
++ kosmik [^2]
++ pale moon [^1]  
 [^1]: only for mac and windows
 [^2]: only for mac
 [^3]: only for windows
+[^4]: windows has restrictions
 
 > [!NOTE]
 > Firefox beta, developer and nightly are portable versions in linux, these cannot be installed through package managers.  
 > Identification of these versions (as kind of local installations) is not supported by this library.
+
+> [!NOTE]
+> Vivaldi stable and snapshot cannot be installed simultaneously on windows. Any of them counts as vivaldi after installation, only the application icon and version number differ between these, but only one instance can be used.   
+> For identification, it does not matter which one is installed, it is detected as vivaldi.
+
+> [!NOTE]
+> Kosmik is partially supported by mac. Identification works but from its specific nature, browser cannot be set as default currently.
+
+> [!NOTE]
+> Pale moon is not supported by linux as it behaves as a kind of local installation.
 
 > [!IMPORTANT]
 > **Firefox beta is not supported** in any of the operating systems as it is almost identical with the stable version.
