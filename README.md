@@ -1,15 +1,23 @@
 <table>
-<div>
+<div align="center">
 <img src="https://img.shields.io/github/created-at/undeflorate/installed_browsers?logo=github">
 <img src="https://img.shields.io/pypi/l/installed-browsers?logo=pypi&logoColor=yellow&color=white">
 <img src="https://img.shields.io/pypi/dm/installed-browsers?logo=pypi&logoColor=yellow">
-<img src="https://img.shields.io/github/issues/undeflorate/installed_browsers?logo=github">
 <img src="https://img.shields.io/github/watchers/undeflorate/installed_browsers?logo=github&style=flat">
-<img src="https://img.shields.io/pypi/pyversions/installed-browsers?logo=python&logoColor=green">
+</div>
+<div align="center">
+<img src="https://img.shields.io/github/commit-activity/t/undeflorate/installed_browsers?logo=github">
+<img src="https://img.shields.io/github/last-commit/undeflorate/installed_browsers/master?logo=github">
+</div>
+<div align="center">
 <img src="https://img.shields.io/github/deployments/undeflorate/installed_browsers/production?logo=github&label=deployment">
 <img src="https://img.shields.io/pypi/status/installed-browsers?logo=pypi&logoColor=yellow">
 <img src="https://img.shields.io/github/actions/workflow/status/undeflorate/installed_browsers/python-app.yml?branch=master&logo=githubactions&logoColor=white&label=test%20automation">
 <img src="https://img.shields.io/codecov/c/github/undeflorate/installed_browsers/master?logo=codecov">
+</div>
+<div align="center">
+<img src="https://img.shields.io/github/issues/undeflorate/installed_browsers?logo=github">
+<img src="https://img.shields.io/pypi/pyversions/installed-browsers?logo=python&logoColor=green">
 <img src="https://img.shields.io/github/v/release/undeflorate/installed_browsers?logo=github">
 <img src="https://img.shields.io/pypi/v/installed-browsers?logo=pypi&logoColor=yellow">
 </div>
