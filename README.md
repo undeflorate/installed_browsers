@@ -10,7 +10,6 @@
 <img src="https://img.shields.io/github/watchers/undeflorate/installed_browsers?style=plastic">
 <img src="https://img.shields.io/pypi/v/installed-browsers?style=plastic&logo=pypi">
 <img src="https://img.shields.io/github/v/release/undeflorate/installed_browsers?logo=github">
-<img src="[Test Automation](https://github.com/undeflorate/installed_browsers/actions/workflows/python-app.yml/badge.svg)](https://github.com/undeflorate/installed_browsers/actions/workflows/python-app.yml)">
 
 </div>
 </table>
