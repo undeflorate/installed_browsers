@@ -1,3 +1,20 @@
+<table>
+<div>
+<img src="https://img.shields.io/github/created-at/undeflorate/installed_browsers?style=plastic">
+<img src="https://img.shields.io/pypi/dm/installed-browsers?style=plastic&logo=pypi">
+<img src="https://img.shields.io/github/issues/undeflorate/installed_browsers?style=plastic">
+<img src="https://img.shields.io/pypi/l/installed-browsers?style=plastic&logo=pypi">
+<img src="https://img.shields.io/github/deployments/undeflorate/installed_browsers/production?style=plastic&logo=github">
+<img src="https://img.shields.io/pypi/status/installed-browsers?style=plastic&logo=pypi&logoColor=">
+<img src="https://img.shields.io/pypi/pyversions/installed-browsers?style=plastic&logo=python&logoColor=green">
+<img src="https://img.shields.io/github/watchers/undeflorate/installed_browsers?style=plastic">
+<img src="https://img.shields.io/pypi/v/installed-browsers?style=plastic&logo=pypi">
+<img src="https://img.shields.io/github/v/release/undeflorate/installed_browsers?logo=github">
+<img src="[Test Automation](https://github.com/undeflorate/installed_browsers/actions/workflows/python-app.yml/badge.svg)](https://github.com/undeflorate/installed_browsers/actions/workflows/python-app.yml)">
+
+</div>
+</table>
+
 # installed browsers
 A simple python library to help you identify the installed browsers in your host operating system.
 
