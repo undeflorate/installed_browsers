@@ -1,6 +1,6 @@
 <table>
 <div align="center">
-<img src="https://img.shields.io/github/created-at/undeflorate/installed_browsers?logo=github">
+<img src="https://img.shields.io/github/created-at/undeflorate/installed_browsers?logo=github&label=since">
 <img src="https://img.shields.io/pypi/l/installed-browsers?logo=pypi&logoColor=yellow&color=white">
 <img src="https://img.shields.io/pypi/dm/installed-browsers?logo=pypi&logoColor=yellow">
 <img src="https://img.shields.io/github/watchers/undeflorate/installed_browsers?logo=github&style=flat">
@@ -55,7 +55,7 @@ A simple python library to help you identify the installed browsers in your host
 + microsoft edge developer
 + brave
 + brave beta
-+ brave developer
++ brave nightly
 + vivaldi [^4]
 + vivaldi snapshot [^4]
 + min
@@ -121,6 +121,17 @@ print(installed_browsers.what_is_the_default_browser())
 #### output
 ```
 Google Chrome
+```
+### check if browser is installed
+Returns `True` if the browser is installed.
+```python
+import installed_browsers
+
+print(installed_browsers.do_i_have_installed("chrome"))
+```
+#### output
+```
+True
 ```
 ### get specific browser details
 Returns a dictionary containing browser name, description, desktop version and location.
