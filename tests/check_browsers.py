@@ -495,7 +495,8 @@ class TestBrowserVersion:
     def test_version_of_browser(self, mock_winreg_qv, browser: str, description: str, version: Dict, location: str):
         match sys.platform:
             case OS.LINUX | OS.MAC:
-                available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
+                available_browsers = [individual_browser["name"] for individual_browser
+                                      in installed_browsers.browsers()]
                 if browser in available_browsers:
                     assert installed_browsers.get_version_of(browser) == version
             case OS.WINDOWS:
