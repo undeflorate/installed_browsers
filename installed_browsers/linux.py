@@ -42,11 +42,14 @@ VERSION_PATTERN = re.compile(r"\b(\S+\.\S+)\b")
 
 # get all installed browsers
 def browsers() -> Iterator[Browser]:
+    unique_browsers = set()
     for browser, desktop_entries in POSSIBLE_BROWSERS:
         for application_dir in BROWSER_LOCATIONS:
             for desktop_entry in desktop_entries:
                 path = os.path.join(application_dir, f"{desktop_entry}.desktop")
                 if not os.path.isfile(path):
+                    continue
+                if browser in unique_browsers:
                     continue
                 entry = DesktopEntry(path)
                 executable_path = entry.getExec()
@@ -59,6 +62,7 @@ def browsers() -> Iterator[Browser]:
                 yield Browser(
                     name=browser, description=entry.getName(), version=version, location=executable_path
                 )
+                unique_browsers.add(browser)
 
 
 # get default browser
