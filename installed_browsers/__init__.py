@@ -58,15 +58,15 @@ def do_i_have_installed(name: str):
                 Possible browser entries / parameters\n
                 for Linux:\n
                 chrome, chromium, firefox, opera, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev
-                brave, brave-beta, brave-nightly\n
+                brave, brave-beta, brave-nightly, vivaldi, vivaldi-snapshot, min\n
                 for macOS:\n
                 chrome, chrome-canary, chromium, firefox, firefox-developer, firefox-nightly,
                 safari, opera, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev, msedge-canary,
-                brave, brave-beta, brave-nightly\n
+                brave, brave-beta, brave-nightly, vivaldi, vivaldi-snapshot, min, arc, kosmik, pale-moon\n
                 for Windows:\n
                 chrome, chrome-canary, chromium, firefox, firefox-developer, firefox-nightly,
                 opera-stable, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev, msedge-canary, msie,
-                brave, brave-beta, brave-nightly
+                brave, brave-beta, brave-nightly, vivaldi, min, pale-moon
     :return: True or False depending on the browser is installed or not.
     """
     match sys.platform:
@@ -91,15 +91,15 @@ def give_me_details_of(name: str) -> Optional[Browser | str]:
                 Possible browser entries / parameters\n
                 for Linux:\n
                 chrome, chromium, firefox, opera, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev
-                brave, brave-beta, brave-nightly\n
+                brave, brave-beta, brave-nightly, vivaldi, vivaldi-snapshot, min\n
                 for macOS:\n
                 chrome, chrome-canary, chromium, firefox, firefox-developer, firefox-nightly,
                 safari, opera, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev, msedge-canary,
-                brave, brave-beta, brave-nightly\n
+                brave, brave-beta, brave-nightly, vivaldi, vivaldi-snapshot, min, arc, kosmik, pale-moon\n
                 for Windows:\n
                 chrome, chrome-canary, chromium, firefox, firefox-developer, firefox-nightly,
                 opera-stable, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev, msedge-canary, msie,
-                brave, brave-beta, brave-nightly
+                brave, brave-beta, brave-nightly, vivaldi, min, pale-moon
     :return: Dictionary containing browser name, description, desktop version and location.
     """
     match sys.platform:
@@ -125,15 +125,15 @@ def get_version_of(name: str) -> Optional[Version | str]:
                 Possible browser entries / parameters\n
                 for Linux:\n
                 chrome, chromium, firefox, opera, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev
-                brave, brave-beta, brave-nightly\n
+                brave, brave-beta, brave-nightly, vivaldi, vivaldi-snapshot, min\n
                 for macOS:\n
                 chrome, chrome-canary, chromium, firefox, firefox-developer, firefox-nightly,
                 safari, opera, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev, msedge-canary,
-                brave, brave-beta, brave-nightly\n
+                brave, brave-beta, brave-nightly, vivaldi, vivaldi-snapshot, min, arc, kosmik, pale-moon\n
                 for Windows:\n
                 chrome, chrome-canary, chromium, firefox, firefox-developer, firefox-nightly,
                 opera-stable, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev, msedge-canary, msie,
-                brave, brave-beta, brave-nightly
+                brave, brave-beta, brave-nightly, vivaldi, min, pale-moon
     :return: Browser description and version.
     """
     match sys.platform:
