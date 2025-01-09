@@ -282,9 +282,9 @@ def test_no_default_browser(mock_winreg_qv, mock_winreg_qve, mock_check_output, 
             "firefox",
             {
                 "name": "firefox",
-                "description": "Firefox",
+                "description": "Firefox Web Browser",
                 "version": ANY,
-                "location": ANY
+                "location": "firefox"
             },
             marks=pytest.mark.skipif(sys.platform != "linux", reason="linux-only"),
             id="firefox_linux",
