@@ -43,6 +43,8 @@ match sys.platform:
         pytest.param("chrome", "Google Chrome", id="chrome"),
         pytest.param("chromium", "Chromium", id="chromium"),
         pytest.param("firefox", "Mozilla Firefox", id="firefox"),
+        pytest.param("firefox", "Mozilla Firefox", id="firefox_beta",
+                     marks=pytest.mark.skipif(sys.platform != "linux", reason="linux-only")),
         pytest.param("safari", "Safari", id="safari",
                      marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")),
         pytest.param(
@@ -282,9 +284,9 @@ def test_no_default_browser(mock_winreg_qv, mock_winreg_qve, mock_check_output, 
             "firefox",
             {
                 "name": "firefox",
-                "description": "Firefox Web Browser",
+                "description": "Firefox Web Browser", # rename for only Firefox after 17th January 2025
                 "version": ANY,
-                "location": "firefox"
+                "location": "firefox"                 # change to ANY after 17th January 2025
             },
             marks=pytest.mark.skipif(sys.platform != "linux", reason="linux-only"),
             id="firefox_linux",
