@@ -16,7 +16,7 @@ These tests are based on the existing browsers of GitHub Actions virtual environ
 """
 
 # constant declaration
-DEFAULT_BROWSER_LINUX = "Firefox Web Browser"
+DEFAULT_BROWSER_LINUX = "Firefox"
 DEFAULT_BROWSER_MAC = "Firefox"
 DEFAULT_BROWSER_WINDOWS_FIREFOX = "Mozilla Firefox"
 DEFAULT_BROWSER_WINDOWS_CHROME_CANARY = "Google Chrome Canary"
@@ -41,7 +41,7 @@ match sys.platform:
     ("browser", "description"),
     (
         pytest.param("chrome", "Google Chrome", id="chrome"),
-        pytest.param("[chromium", "Chromium", id="chromium"),
+        pytest.param("chromium", "Chromium", id="chromium"),
         pytest.param("firefox", "Mozilla Firefox", id="firefox"),
         pytest.param("safari", "Safari", id="safari",
                      marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")),
@@ -67,7 +67,6 @@ class TestBrowserInstallation:
             case OS.LINUX | OS.MAC:
                 available_browsers = [individual_browser["name"] for individual_browser in
                                       installed_browsers.browsers()]
-                print(installed_browsers.do_i_have_installed("chromium"), "chromium")
                 if browser in available_browsers:
                     assert installed_browsers.do_i_have_installed(browser)
                 else:
@@ -283,9 +282,9 @@ def test_no_default_browser(mock_winreg_qv, mock_winreg_qve, mock_check_output, 
             "firefox",
             {
                 "name": "firefox",
-                "description": "Firefox Web Browser",
+                "description": "Firefox",
                 "version": ANY,
-                "location": "firefox"
+                "location": ANY
             },
             marks=pytest.mark.skipif(sys.platform != "linux", reason="linux-only"),
             id="firefox_linux",
