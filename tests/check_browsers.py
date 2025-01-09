@@ -43,8 +43,6 @@ match sys.platform:
         pytest.param("chrome", "Google Chrome", id="chrome"),
         pytest.param("chromium", "Chromium", id="chromium"),
         pytest.param("firefox", "Mozilla Firefox", id="firefox"),
-        pytest.param("firefox", "Mozilla Firefox", id="firefox_beta",
-                     marks=pytest.mark.skipif(sys.platform != "linux", reason="linux-only")),
         pytest.param("safari", "Safari", id="safari",
                      marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")),
         pytest.param(

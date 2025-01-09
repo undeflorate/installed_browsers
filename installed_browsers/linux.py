@@ -50,7 +50,7 @@ def browsers() -> Iterator[Browser]:
                 if not os.path.isfile(path):
                     continue
                 if browser in unique_browsers:
-                    continue
+                    continue    # pragma: no cover
                 entry = DesktopEntry(path)
                 executable_path = entry.getExec()
                 if executable_path.lower().endswith(" %u"):
