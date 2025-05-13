@@ -43,8 +43,19 @@ match sys.platform:
         pytest.param("chrome", "Google Chrome", id="chrome"),
         pytest.param("chromium", "Chromium", id="chromium"),
         pytest.param("firefox", "Mozilla Firefox", id="firefox"),
-        pytest.param("safari", "Safari", id="safari",
-                     marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")),
+        pytest.param(
+            "safari",
+            {
+                "name": "safari",
+                "description": "Safari",
+                "version": ANY,
+                "location": "/Applications/Safari.app"
+            },
+            marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only"),
+            id="safari_mac",
+        ),
+        # pytest.param("safari", "Safari", id="safari",
+                     # marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")),
         pytest.param(
             "msedge", "Microsoft Edge", id="msedge",
             marks=pytest.mark.skipif(sys.platform == "linux", reason="mac-and-windows-only")
