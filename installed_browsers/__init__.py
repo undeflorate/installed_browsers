@@ -1,8 +1,14 @@
 import sys
 from typing import Iterator, Optional
-
-from . import linux, mac, windows
 from .common import Browser, Version, OS
+
+match sys.platform:
+    case OS.LINUX:
+        from . import linux
+    case OS.MAC:
+        from . import mac
+    case OS.WINDOWS:
+        from . import windows
 
 __all__ = ["Browser",
            "browsers",
