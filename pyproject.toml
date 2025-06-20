@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "installed-browsers"
-version = "0.1.4"
+version = "0.1.5"
 repository = "https://github.com/undeflorate/installed_browsers"
 description = "Python library to check installed browsers"
 authors = ["undeflorate <swanslayer@gmail.com>"]
@@ -13,6 +13,8 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
 ]
 
 packages = [
