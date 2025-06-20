@@ -96,6 +96,9 @@ def what_is_the_default_browser() -> Optional[str]:
     for handler in configuration["LSHandlers"]:
         if handler.get("LSHandlerURLScheme") == "https":
             role = handler["LSHandlerRoleAll"]
+            if role not in SUPPORTED_BROWSERS:
+                default_browser = "Default browser is not supported."
+                continue
             default_browser = SUPPORTED_BROWSERS[role]
             for name, bundle_id, version_string in (browser_record for browser_record in POSSIBLE_BROWSERS
                                                     if browser_record[1].lower() == role):

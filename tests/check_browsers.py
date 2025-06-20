@@ -24,6 +24,8 @@ DEFAULT_BROWSER_WINDOWS_EDGE = "Microsoft Edge"
 DEFAULT_BROWSER_WINDOWS_MIN = "Min"
 NO_DEFAULT_BROWSER = "No browser is set to default."
 BROWSER_NOT_INSTALLED = "Browser is not installed."
+DEFAULT_BROWSER_NOT_SUPPORTED = "Default browser is not supported."
+DUMMY_DEFAULT_BROWSER = "dummy.browser"
 OPERATING_SYSTEM_NOT_SUPPORTED = "This operating system is not yet supported."
 
 # winreg should be mocked for linux and mac
@@ -100,6 +102,11 @@ def test_os_is_not_supported():
             id="default_firefox_mac", marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")
         ),
         pytest.param(
+            {'LSHandlers': [{'LSHandlerURLScheme': 'https', 'LSHandlerRoleAll': DUMMY_DEFAULT_BROWSER,
+                             'LSHandlerPreferredVersions': {'LSHandlerRoleAll': '-'}}]},
+            id="default_dummy_not_supported_mac", marks=pytest.mark.skipif(sys.platform != "darwin", reason="mac-only")
+        ),
+        pytest.param(
             "Microsoft Edge", id="default_edge_windows",
             marks=pytest.mark.skipif(sys.platform != "win32", reason="windows-only")
         ),
@@ -134,13 +141,19 @@ def test_default_browser(mock_winreg_qv, mock_winreg_qve, mock_subprocess_get,
             mock_desktopentry.return_value = DEFAULT_BROWSER_LINUX
             assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_LINUX
         case OS.MAC:
-            mock_load.side_effect = [browser, {'CFBundleExecutable': 'firefox'}]
-            mock_subprocess_get.return_value = '/Applications/Firefox.app'
-            # with patch("builtins.open", mock_open(), create=True):
-            # with patch.object(Path, "open"):
-            with patch.object(Path, "open"):
-                with patch.object(builtins, "open"):
-                    assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_MAC
+            if DEFAULT_BROWSER_MAC.lower() in str(browser):
+                mock_load.side_effect = [browser, {'CFBundleExecutable': 'firefox'}]
+                mock_subprocess_get.return_value = '/Applications/Firefox.app'
+                # with patch("builtins.open", mock_open(), create=True):
+                # with patch.object(Path, "open"):
+                with patch.object(Path, "open"):
+                    with patch.object(builtins, "open"):
+                        assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_MAC
+            else:
+                mock_load.side_effect = [browser, {'CFBundleExecutable': DUMMY_DEFAULT_BROWSER}]
+                with patch.object(Path, "open"):
+                    with patch.object(builtins, "open"):
+                        assert installed_browsers.what_is_the_default_browser() == DEFAULT_BROWSER_NOT_SUPPORTED
         case OS.WINDOWS:
             if browser == DEFAULT_BROWSER_WINDOWS_FIREFOX:
                 mock_winreg_qve.return_value = ["FirefoxURL-308046B0AF4A39CB"]
