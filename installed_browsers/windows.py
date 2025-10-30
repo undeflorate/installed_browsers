@@ -39,6 +39,8 @@ POSSIBLE_BROWSERS = {
     "Vivaldi": "vivaldi",
     "Min": "min",
     "Pale Moon": "pale-moon",
+    "Shift Browser": "shift",
+    "DuckDuckGo": "duckduckgo"
 }
 
 # dictionary of default browsers
@@ -59,7 +61,9 @@ DEFAULT_BROWSER_DETAILS = {
     "BraveSSHTM": "Brave Nightly",
     "VivaldiHTM": "Vivaldi",
     "Min": "Min",
-    "PaleMoonURL": "Pale Moon"
+    "PaleMoonURL": "Pale Moon",
+    "ShiftHTM": "Shift",
+    "duckduckgo": "DuckDuckGo"
 }
 
 # dictionary of possible browser names
@@ -94,6 +98,8 @@ def what_is_the_default_browser() -> Optional[str]:
                 return _setup_firefox_versions(default_browser)
             elif DOT in default_browser:
                 default_browser = default_browser.split(".", 1)[0]
+            elif 'AppX' in default_browser:
+                return _search_for_default_duckduckgo(default_browser)
             description = DEFAULT_BROWSER_DETAILS.get(default_browser, "unknown")
             for browser in (browser_record for browser_record in POSSIBLE_BROWSERS
                             if description == browser_record):
@@ -315,6 +321,7 @@ def _setup_firefox_versions(browser_id: str) -> str:
             pass
 
 
+# get only unique browsers
 def _get_unique_browsers(winreg_key) -> Iterator[Browser]:
     # get browsers from local machine
     browsers_local_machine = _get_browsers_from_registry(winreg.HKEY_LOCAL_MACHINE,
@@ -343,3 +350,55 @@ def _get_unique_browsers(winreg_key) -> Iterator[Browser]:
             elif browser_local_machine not in duplicates:
                 yield browser_local_machine
                 break
+
+    # get duckduckgo and filter for unique occurance
+    for duckduckgo in _search_for_duckduckgo():
+        if duckduckgo not in duplicates:
+            duplicates.append(duckduckgo)
+            yield duckduckgo
+
+
+# search for duckduckgo browser
+def _search_for_default_duckduckgo(browser_id: str) -> str:
+    registry_path = fr'Software\Classes\{browser_id}\Application'
+    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, registry_path) as hkey:
+        default_browser = winreg.QueryValueEx(hkey, "ApplicationName")[0]
+    return DEFAULT_BROWSER_DETAILS.get(default_browser.lower(), "unknown")
+
+
+def _search_for_duckduckgo() -> Browser:
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Classes") as hkey:
+            i = 0
+            while True:
+                try:
+                    subkey = winreg.EnumKey(hkey, i)
+                    i += 1
+                except OSError:  # pragma: no cover
+                    break
+                try:
+                    description = winreg.QueryValue(hkey, subkey)
+                    if not description or not isinstance(description, str):  # pragma: no cover
+                        description = subkey
+                    if description.startswith('AppX'):
+                        registry_path = fr'Software\Classes\{description}\Application'
+                        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, registry_path) as key:
+                            browser = winreg.QueryValueEx(key, "AppUserModelID")[0]
+                            if 'DesktopBrowser' in browser:
+                                description = winreg.QueryValueEx(key, "ApplicationName")[0]
+                                try:
+                                    cmd = winreg.QueryValue(hkey, rf"{subkey}\shell\open\command")
+                                    cmd = cmd.strip('"')
+                                    os.stat(cmd)
+                                except (OSError, AttributeError, TypeError, ValueError):  # pragma: no cover
+                                    continue
+                                yield Browser(
+                                    name=POSSIBLE_BROWSERS.get(description, "unknown"),
+                                    description=description,
+                                    version=_create_browser_version(cmd),
+                                    location=cmd
+                                )
+                except OSError:  # pragma: no cover
+                    description = subkey
+    except FileNotFoundError:  # pragma: no cover
+         pass
