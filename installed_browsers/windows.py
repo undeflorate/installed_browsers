@@ -76,6 +76,9 @@ DASH = "-"
 DOT = "."
 EXECUTABLE = "exe"
 FIREFOX = "firefox"
+DUCKDUCKGO = "duckduckgo"
+DUCK_INSTALL = "AppX"
+DESKTOP_BROWSER = "DesktopBrowser"
 
 
 # get all installed browsers
@@ -98,7 +101,7 @@ def what_is_the_default_browser() -> Optional[str]:
                 return _setup_firefox_versions(default_browser)
             elif DOT in default_browser:
                 default_browser = default_browser.split(".", 1)[0]
-            elif 'AppX' in default_browser:
+            elif DUCK_INSTALL in default_browser:
                 return _search_for_default_duckduckgo(default_browser)
             description = DEFAULT_BROWSER_DETAILS.get(default_browser, "unknown")
             for browser in (browser_record for browser_record in POSSIBLE_BROWSERS
@@ -115,6 +118,9 @@ def do_i_have_installed(name):
     for browser in (browser_record for browser_record in POSSIBLE_BROWSER_NAMES
                     if name == browser_record):
         browser_name = POSSIBLE_BROWSER_NAMES[browser]
+
+        if name == DUCKDUCKGO:
+            return _get_duckduckgo_from_registry()
 
         match platform.architecture()[0]:
             case OS.WIN32:  # pragma: no cover
@@ -136,6 +142,8 @@ def get_details_of(name) -> Optional[Browser | str]:
                     if name == browser_record):
         browser_name = POSSIBLE_BROWSER_NAMES[browser]
 
+        if name == DUCKDUCKGO:
+            yield _get_duckduckgo_details_from_registry()
         yield _get_browser_details_from_registry(winreg.HKEY_CURRENT_USER, winreg.KEY_READ, browser_name)
         match platform.architecture()[0]:   # pragma: no cover
             case OS.WIN32:
@@ -152,6 +160,9 @@ def get_version_of(name) -> Optional[Version | str]:
     for browser in (browser_record for browser_record in POSSIBLE_BROWSER_NAMES
                     if name == browser_record):
         browser_name = POSSIBLE_BROWSER_NAMES[browser]
+
+        if name == DUCKDUCKGO:
+            yield _get_duckduckgo_version_from_registry()
 
         yield _get_browser_version_from_registry(winreg.HKEY_CURRENT_USER, winreg.KEY_READ, browser_name)
         match platform.architecture()[0]:
@@ -366,7 +377,7 @@ def _search_for_default_duckduckgo(browser_id: str) -> str:
     return DEFAULT_BROWSER_DETAILS.get(default_browser.lower(), "unknown")
 
 
-def _search_for_duckduckgo() -> Browser:
+def _search_for_duckduckgo() -> Iterator[Browser]:
     try:
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Classes") as hkey:
             i = 0
@@ -380,11 +391,11 @@ def _search_for_duckduckgo() -> Browser:
                     description = winreg.QueryValue(hkey, subkey)
                     if not description or not isinstance(description, str):  # pragma: no cover
                         description = subkey
-                    if description.startswith('AppX'):
+                    if description.startswith(DUCK_INSTALL):
                         registry_path = fr'Software\Classes\{description}\Application'
                         with winreg.OpenKey(winreg.HKEY_CURRENT_USER, registry_path) as key:
                             browser = winreg.QueryValueEx(key, "AppUserModelID")[0]
-                            if 'DesktopBrowser' in browser:
+                            if DESKTOP_BROWSER in browser:
                                 description = winreg.QueryValueEx(key, "ApplicationName")[0]
                                 try:
                                     cmd = winreg.QueryValue(hkey, rf"{subkey}\shell\open\command")
@@ -397,6 +408,110 @@ def _search_for_duckduckgo() -> Browser:
                                     description=description,
                                     version=_create_browser_version(cmd),
                                     location=cmd
+                                )
+                except OSError:  # pragma: no cover
+                    description = subkey
+    except FileNotFoundError:  # pragma: no cover
+         pass
+
+
+# get duckduckgo from registry
+def _get_duckduckgo_from_registry():
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Classes") as hkey:
+            browser_found = False
+            i = 0
+            while True:
+                try:
+                    subkey = winreg.EnumKey(hkey, i)
+                    i += 1
+                except OSError:  # pragma: no cover
+                    break
+                try:
+                    description = winreg.QueryValue(hkey, subkey)
+                    if not description or not isinstance(description, str):  # pragma: no cover
+                        description = subkey
+                    if description.startswith(DUCK_INSTALL):
+                        registry_path = fr'Software\Classes\{description}\Application'
+                        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, registry_path) as key:
+                            browser = winreg.QueryValueEx(key, "AppUserModelID")[0]
+                            if DESKTOP_BROWSER in browser:
+                                browser_found = True
+                                break
+                except FileNotFoundError:  # pragma: no cover
+                    pass
+            return browser_found
+    except FileNotFoundError:  # pragma: no cover
+         pass
+
+
+# get duckduckgo details from registry
+def _get_duckduckgo_details_from_registry() -> Optional[Browser | str]:
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Classes") as hkey:
+            i = 0
+            while True:
+                try:
+                    subkey = winreg.EnumKey(hkey, i)
+                    i += 1
+                except OSError:  # pragma: no cover
+                    break
+                try:
+                    description = winreg.QueryValue(hkey, subkey)
+                    if not description or not isinstance(description, str):  # pragma: no cover
+                        description = subkey
+                    if description.startswith(DUCK_INSTALL):
+                        registry_path = fr'Software\Classes\{description}\Application'
+                        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, registry_path) as key:
+                            browser = winreg.QueryValueEx(key, "AppUserModelID")[0]
+                            if DESKTOP_BROWSER in browser:
+                                description = winreg.QueryValueEx(key, "ApplicationName")[0]
+                                try:
+                                    cmd = winreg.QueryValue(hkey, rf"{subkey}\shell\open\command")
+                                    cmd = cmd.strip('"')
+                                    os.stat(cmd)
+                                except (OSError, AttributeError, TypeError, ValueError):  # pragma: no cover
+                                    continue
+                                yield Browser(
+                                    name=POSSIBLE_BROWSERS.get(description, "unknown"),
+                                    description=description,
+                                    version=_create_browser_version(cmd),
+                                    location=cmd
+                                )
+                except OSError:  # pragma: no cover
+                    description = subkey
+    except FileNotFoundError:  # pragma: no cover
+         pass
+
+
+# get duckduckgo version from registry
+def _get_duckduckgo_version_from_registry() -> Optional[Version | str]:
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Classes") as hkey:
+            i = 0
+            while True:
+                try:
+                    subkey = winreg.EnumKey(hkey, i)
+                    i += 1
+                except OSError:  # pragma: no cover
+                    break
+                try:
+                    description = winreg.QueryValue(hkey, subkey)
+                    if not description or not isinstance(description, str):  # pragma: no cover
+                        description = subkey
+                    if description.startswith(DUCK_INSTALL):
+                        registry_path = fr'Software\Classes\{description}\Application'
+                        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, registry_path) as key:
+                            browser = winreg.QueryValueEx(key, "AppUserModelID")[0]
+                            if DESKTOP_BROWSER in browser:
+                                try:
+                                    cmd = winreg.QueryValue(hkey, rf"{subkey}\shell\open\command")
+                                    cmd = cmd.strip('"')
+                                    os.stat(cmd)
+                                except (OSError, AttributeError, TypeError, ValueError):  # pragma: no cover
+                                    continue
+                                yield Version(
+                                    version=_create_browser_version(cmd)
                                 )
                 except OSError:  # pragma: no cover
                     description = subkey
