@@ -1,7 +1,7 @@
 import builtins
 import sys
 from pathlib import Path
-from typing import Dict, Generator
+from typing import Dict
 from unittest.mock import ANY, mock_open
 from unittest.mock import Mock
 from unittest.mock import patch
