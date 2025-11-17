@@ -362,7 +362,7 @@ def _get_unique_browsers(winreg_key) -> Iterator[Browser]:
                 yield browser_local_machine
                 break
 
-    # get duckduckgo and filter for unique occurance
+    # get duckduckgo and filter for unique occurrence
     for duckduckgo in _search_for_duckduckgo():
         if duckduckgo not in duplicates:
             duplicates.append(duckduckgo)
