@@ -472,7 +472,7 @@ def _get_duckduckgo_details_from_registry() -> Optional[Browser | str]:
                                     os.stat(cmd)
                                 except (OSError, AttributeError, TypeError, ValueError):  # pragma: no cover
                                     continue
-                                yield Browser(
+                                return Browser(
                                     name=POSSIBLE_BROWSERS.get(description, "unknown"),
                                     description=description,
                                     version=_create_browser_version(cmd),
@@ -510,7 +510,7 @@ def _get_duckduckgo_version_from_registry() -> Optional[Version | str]:
                                     os.stat(cmd)
                                 except (OSError, AttributeError, TypeError, ValueError):  # pragma: no cover
                                     continue
-                                yield Version(
+                                return Version(
                                     version=_create_browser_version(cmd)
                                 )
                 except OSError:  # pragma: no cover
