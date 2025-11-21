@@ -144,6 +144,8 @@ def get_details_of(name) -> Optional[Browser | str]:
 
         if name == DUCKDUCKGO:
             yield _get_duckduckgo_details_from_registry()
+            return
+
         yield _get_browser_details_from_registry(winreg.HKEY_CURRENT_USER, winreg.KEY_READ, browser_name)
         match platform.architecture()[0]:   # pragma: no cover
             case OS.WIN32:
@@ -163,6 +165,7 @@ def get_version_of(name) -> Optional[Version | str]:
 
         if name == DUCKDUCKGO:
             yield _get_duckduckgo_version_from_registry()
+            return
 
         yield _get_browser_version_from_registry(winreg.HKEY_CURRENT_USER, winreg.KEY_READ, browser_name)
         match platform.architecture()[0]:
@@ -472,7 +475,7 @@ def _get_duckduckgo_details_from_registry() -> Optional[Browser | str]:
                                     os.stat(cmd)
                                 except (OSError, AttributeError, TypeError, ValueError):  # pragma: no cover
                                     continue
-                                return Browser(
+                                yield Browser(
                                     name=POSSIBLE_BROWSERS.get(description, "unknown"),
                                     description=description,
                                     version=_create_browser_version(cmd),
@@ -510,7 +513,7 @@ def _get_duckduckgo_version_from_registry() -> Optional[Version | str]:
                                     os.stat(cmd)
                                 except (OSError, AttributeError, TypeError, ValueError):  # pragma: no cover
                                     continue
-                                return Version(
+                                yield Version(
                                     version=_create_browser_version(cmd)
                                 )
                 except OSError:  # pragma: no cover
