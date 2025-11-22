@@ -471,7 +471,7 @@ def test_get_duckduckgo_details(mock_winreg_ek, mock_winreg_ok, mock_winreg_qv, 
             mock_winreg_qve.side_effect = [[DESKTOP_BROWSER], [DEFAULT_BROWSER_WINDOWS_DUCK]]
             mock_winreg_qv.side_effect = ['AppX', details["location"]]
             mock_winreg_ok.return_value = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Classes")
-            mock_winreg_ek.side_effect = ['AppX']
+            mock_winreg_ek.side_effect = ['AppX', OSError]
             if browser in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
                 assert installed_browsers.give_me_details_of(browser) == details
             else:
@@ -666,7 +666,7 @@ class TestDuckDuckGoWindowsVersion:
                 mock_winreg_qv.side_effect = [description, location]
                 mock_winreg_ok.return_value = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Classes")
                 mock_winreg_qve.return_value = [DESKTOP_BROWSER]
-                mock_winreg_ek.side_effect = [description]
+                mock_winreg_ek.side_effect = [description, OSError]
                 if browser in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
                     assert installed_browsers.get_version_of(browser) == version
                 else:
