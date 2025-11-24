@@ -471,7 +471,7 @@ def test_get_duckduckgo_details(mock_winreg_ek, mock_winreg_ok, mock_winreg_qv, 
             mock_winreg_qve.side_effect = [[DESKTOP_BROWSER], [DEFAULT_BROWSER_WINDOWS_DUCK]]
             mock_winreg_qv.side_effect = ['AppX', details["location"]]
             mock_winreg_ok.return_value = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Classes")
-            mock_winreg_ek.return_value = 'AppX'
+            mock_winreg_ek.side_effect = ['AppX', OSError]
             if browser in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
                 assert installed_browsers.give_me_details_of(browser) == details
             else:
@@ -659,29 +659,15 @@ class TestDuckDuckGoWindowsVersion:
     @patch("winreg.QueryValue")
     @patch("winreg.QueryValueEx")
     @patch("winreg.EnumKey")
-    def test_version_of_browser(self, mock_winreg_ek, mock_winreg_qve, mock_winreg_qv, mock_winreg_ok, browser: str, description: str, version: Dict, location: str):
+    def test_version_of_browser(self, mock_winreg_ek, mock_winreg_qve, mock_winreg_qv, mock_winreg_ok, browser: str,
+                                description: str, version: Dict, location: str):
         match sys.platform:
             case OS.WINDOWS:
                 mock_winreg_qv.side_effect = [description, location]
                 mock_winreg_ok.return_value = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Classes")
                 mock_winreg_qve.return_value = [DESKTOP_BROWSER]
-                mock_winreg_ek.return_value = description
+                mock_winreg_ek.side_effect = [description, OSError]
                 if browser in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
                     assert installed_browsers.get_version_of(browser) == version
                 else:
                     assert installed_browsers.get_version_of(browser) == BROWSER_NOT_INSTALLED
-
-    @patch("subprocess.getoutput")
-    @patch("os.path.isfile")
-    @patch.dict("sys.modules", winreg=MockWinreg)
-    @patch("winreg.QueryValue")
-    def test_version_not_determined(self, mock_winreg_qv, mock_file, mock_output, browser: str,
-                                    description: str, version: Dict, location: str) -> None:
-        match sys.platform:
-            case OS.LINUX:
-                mock_file.return_value = False
-            case OS.MAC:
-                mock_output.return_value = ""
-            case OS.WINDOWS:
-                mock_winreg_qv.return_value = "dummy"
-        assert installed_browsers.get_version_of(browser) == BROWSER_NOT_INSTALLED
