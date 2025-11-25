@@ -143,16 +143,16 @@ def get_details_of(name) -> Optional[Browser | str]:
         browser_name = POSSIBLE_BROWSER_NAMES[browser]
 
         if name == DUCKDUCKGO:
-            yield _get_duckduckgo_details_from_registry()
+            yield from _get_duckduckgo_details_from_registry()
             return
 
         yield _get_browser_details_from_registry(winreg.HKEY_CURRENT_USER, winreg.KEY_READ, browser_name)
         match platform.architecture()[0]:   # pragma: no cover
             case OS.WIN32:
-                yield _get_browser_details_from_registry(
+                yield from _get_browser_details_from_registry(
                     winreg.HKEY_LOCAL_MACHINE, winreg.KEY_READ | winreg.KEY_WOW64_32KEY, browser_name)
             case OS.WIN64:
-                yield _get_browser_details_from_registry(
+                yield from _get_browser_details_from_registry(
                     winreg.HKEY_LOCAL_MACHINE, winreg.KEY_READ | winreg.KEY_WOW64_64KEY, browser_name)
     return "Browser is not installed."
 
