@@ -425,7 +425,9 @@ def test_no_default_browser(mock_winreg_qv, mock_winreg_qve, mock_check_output, 
 )
 @patch.dict("sys.modules", winreg=MockWinreg)
 @patch("winreg.QueryValue")
-def test_get_browser_details(mock_winreg_qv, browser: str, details: Dict):
+@patch('win32api.GetFileVersionInfo')
+@patch('os.stat')
+def test_get_browser_details(mock_os_stat, mock_win32api_fileversion, mock_winreg_qv, browser: str, details: Dict):
     match sys.platform:
         case OS.LINUX | OS.MAC:
             available_browsers = [individual_browser["name"] for individual_browser in installed_browsers.browsers()]
@@ -435,6 +437,8 @@ def test_get_browser_details(mock_winreg_qv, browser: str, details: Dict):
                 assert installed_browsers.give_me_details_of(browser) == BROWSER_NOT_INSTALLED
         case OS.WINDOWS:
             mock_winreg_qv.side_effect = [details["description"], details["location"]]
+            mock_win32api_fileversion.return_value = {'FileVersionMS': 65536, 'FileVersionLS': 0}
+            mock_os_stat.return_value = True
             if browser in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
                 assert next(installed_browsers.give_me_details_of(browser)) == details
             else:
@@ -611,7 +615,10 @@ def test_get_duckduckgo_details(mock_os_stat, mock_win32api_fileversion, mock_wi
 class TestBrowserVersion:
     @patch.dict("sys.modules", winreg=MockWinreg)
     @patch("winreg.QueryValue")
-    def test_version_of_browser(self, mock_winreg_qv, browser: str, description: str, version: Dict, location: str):
+    @patch('win32api.GetFileVersionInfo')
+    @patch('os.stat')
+    def test_version_of_browser(self, mock_os_stat, mock_win32api_fileversion, mock_winreg_qv, browser: str,
+                                description: str, version: Dict, location: str):
         match sys.platform:
             case OS.LINUX | OS.MAC:
                 available_browsers = [individual_browser["name"] for individual_browser
@@ -620,6 +627,8 @@ class TestBrowserVersion:
                     assert installed_browsers.get_version_of(browser) == version
             case OS.WINDOWS:
                 mock_winreg_qv.side_effect = [description, location]
+                mock_win32api_fileversion.return_value = {'FileVersionMS': 65536, 'FileVersionLS': 0}
+                mock_os_stat.return_value = True
                 if browser in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
                     assert installed_browsers.get_version_of(browser) == version
                 else:
