@@ -436,7 +436,7 @@ def test_get_browser_details(mock_winreg_qv, browser: str, details: Dict):
         case OS.WINDOWS:
             mock_winreg_qv.side_effect = [details["description"], details["location"]]
             if browser in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
-                assert installed_browsers.give_me_details_of(browser) == details
+                assert next(installed_browsers.give_me_details_of(browser)) == details
             else:
                 assert installed_browsers.give_me_details_of(browser) == BROWSER_NOT_INSTALLED
 
@@ -465,13 +465,18 @@ def test_get_browser_details(mock_winreg_qv, browser: str, details: Dict):
 @patch("winreg.QueryValue")
 @patch('winreg.OpenKey')
 @patch('winreg.EnumKey')
-def test_get_duckduckgo_details(mock_winreg_ek, mock_winreg_ok, mock_winreg_qv, mock_winreg_qve, browser: str, details: Dict):
+@patch('win32api.GetFileVersionInfo')
+@patch('os.stat')
+def test_get_duckduckgo_details(mock_os_stat, mock_win32api_fileversion, mock_winreg_ek, mock_winreg_ok, mock_winreg_qv,
+                                mock_winreg_qve, browser: str, details: Dict):
     match sys.platform:
         case OS.WINDOWS:
             mock_winreg_qve.side_effect = [[DESKTOP_BROWSER], [DEFAULT_BROWSER_WINDOWS_DUCK]]
-            mock_winreg_qv.side_effect = ['AppX', details["location"]]
+            mock_winreg_qv.side_effect = ['AppX', details["location"], details["location"]]
             mock_winreg_ok.return_value = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Classes")
             mock_winreg_ek.side_effect = ['AppX', OSError]
+            mock_win32api_fileversion.return_value = {'FileVersionMS': 65536, 'FileVersionLS': 0}
+            mock_os_stat.return_value = True
             if browser in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
                 assert installed_browsers.give_me_details_of(browser) == details
             else:
@@ -659,14 +664,19 @@ class TestDuckDuckGoWindowsVersion:
     @patch("winreg.QueryValue")
     @patch("winreg.QueryValueEx")
     @patch("winreg.EnumKey")
-    def test_version_of_browser(self, mock_winreg_ek, mock_winreg_qve, mock_winreg_qv, mock_winreg_ok, browser: str,
-                                description: str, version: Dict, location: str):
+    @patch('win32api.GetFileVersionInfo')
+    @patch('os.stat')
+    def test_version_of_browser(self, mock_os_stat, mock_win32api_fileversion, mock_winreg_ek, mock_winreg_qve,
+                                mock_winreg_qv, mock_winreg_ok, browser: str, description: str, version: Dict,
+                                location: str):
         match sys.platform:
             case OS.WINDOWS:
                 mock_winreg_qv.side_effect = [description, location]
                 mock_winreg_ok.return_value = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Classes")
                 mock_winreg_qve.return_value = [DESKTOP_BROWSER]
                 mock_winreg_ek.side_effect = [description, OSError]
+                mock_win32api_fileversion.return_value = {'FileVersionMS': 65536, 'FileVersionLS': 0}
+                mock_os_stat.return_value = True
                 if browser in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
                     assert installed_browsers.get_version_of(browser) == version
                 else:
