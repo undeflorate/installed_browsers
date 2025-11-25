@@ -35,9 +35,13 @@ match sys.platform:
     case OS.LINUX | OS.MAC:
         MockWinreg = Mock()
         MockWinreg.QueryValueEx.return_value = dict(dummy="dummy")
+        MockWin32API = Mock()
+        MockWin32API.GetFileVersion.return_value = 666
     case OS.WINDOWS:
-        import winreg
+        import winreg, win32api
         MockWinreg = winreg
+        MockWin32API = win32api
+
 
 # check if given browser is installed in system
 @pytest.mark.parametrize(
@@ -423,7 +427,7 @@ def test_no_default_browser(mock_winreg_qv, mock_winreg_qve, mock_check_output, 
         ),
     ),
 )
-@patch.dict("sys.modules", winreg=MockWinreg)
+@patch.dict("sys.modules", winreg=MockWinreg, win32api=MockWin32API)
 @patch("winreg.QueryValue")
 @patch('win32api.GetFileVersionInfo')
 @patch('os.stat')
@@ -613,7 +617,7 @@ def test_get_duckduckgo_details(mock_os_stat, mock_win32api_fileversion, mock_wi
     ),
 )
 class TestBrowserVersion:
-    @patch.dict("sys.modules", winreg=MockWinreg)
+    @patch.dict("sys.modules", winreg=MockWinreg, win32api=MockWin32API)
     @patch("winreg.QueryValue")
     @patch('win32api.GetFileVersionInfo')
     @patch('os.stat')
