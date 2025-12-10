@@ -141,7 +141,7 @@ def get_version_of(name: str) -> Optional[Version | str]:
                 for Windows:\n
                 chrome, chrome-canary, chromium, firefox, firefox-developer, firefox-nightly,
                 opera-stable, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev, msedge-canary, msie,
-                brave, brave-beta, brave-nightly, vivaldi, min, pale-moon
+                brave, brave-beta, brave-nightly, vivaldi, min, pale-moon, shift, duckduckgo
     :return: Browser description and version.
     """
     match sys.platform:

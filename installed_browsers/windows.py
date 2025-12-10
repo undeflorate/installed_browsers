@@ -144,7 +144,7 @@ def get_details_of(name) -> Optional[Browser | str]:
 
         if name == DUCKDUCKGO:
             yield _get_duckduckgo_details_from_registry()
-            return
+            # return
 
         yield _get_browser_details_from_registry(winreg.HKEY_CURRENT_USER, winreg.KEY_READ, browser_name)
         match platform.architecture()[0]:   # pragma: no cover
