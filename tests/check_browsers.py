@@ -131,15 +131,18 @@ class TestDuckDuckGoWindowsInstallation:
                                    mock_winreg_qv, mock_winreg_qve, browser: str, description: str):
         match sys.platform:
             case OS.WINDOWS:
+                location = (r"C:\Program Files\WindowsApps\DuckDuckGo.DesktopBrowser_0.134.4.0_x64__ya2fgkz3nks94"
+                            r"\WindowsBrowser\DuckDuckGo.exe")
                 mock_winreg_qve.side_effect = [[DESKTOP_BROWSER], [DEFAULT_BROWSER_WINDOWS_DUCK]]
-                mock_winreg_qv.side_effect = ['AppX', ANY, ANY]
+                mock_winreg_qv.side_effect = ['AppX', location, location]
                 mock_winreg_ok.return_value = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Classes")
                 mock_winreg_ek.side_effect = ['AppX', OSError]
                 mock_win32api_fileversion.return_value = {'FileVersionMS': 65536, 'FileVersionLS': 0}
                 mock_os_stat.return_value = True
 
                 for duckduckgo in installed_browsers.windows._search_for_duckduckgo():
-                    assert duckduckgo == {"name": browser, "description": description, "version": ANY, "location": ANY}
+                    assert duckduckgo == {"name": browser, "description": DEFAULT_BROWSER_WINDOWS_DUCK,
+                                          "version": ANY, "location": ANY}
 
 
 # only linux, mac and windows operating systems are supported
