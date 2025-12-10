@@ -117,10 +117,10 @@ def give_me_details_of(name: str) -> Optional[Browser | str]:
                 return found
         case OS.WINDOWS:
             for found in windows.get_details_of(name):
-                if found:
-                    return found
-                # for details in found:
-                #    return details
+                # if found:
+                #     return found
+                for details in found:
+                   return details
             return "Browser is not installed."
 
 
