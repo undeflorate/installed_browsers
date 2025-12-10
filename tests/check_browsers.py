@@ -436,7 +436,7 @@ def test_get_browser_details(mock_winreg_qv, browser: str, details: Dict):
         case OS.WINDOWS:
             mock_winreg_qv.side_effect = [details["description"], details["location"]]
             if browser in installed_browsers.windows.POSSIBLE_BROWSER_NAMES:
-                assert next(installed_browsers.give_me_details_of(browser)) == details
+                assert installed_browsers.give_me_details_of(browser) == details
             else:
                 assert installed_browsers.give_me_details_of(browser) == BROWSER_NOT_INSTALLED
 
