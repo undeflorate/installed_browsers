@@ -117,8 +117,10 @@ def give_me_details_of(name: str) -> Optional[Browser | str]:
                 return found
         case OS.WINDOWS:
             for found in windows.get_details_of(name):
+                # if found:
+                #     return found
                 for details in found:
-                    return details
+                   return details
             return "Browser is not installed."
 
 
@@ -139,7 +141,7 @@ def get_version_of(name: str) -> Optional[Version | str]:
                 for Windows:\n
                 chrome, chrome-canary, chromium, firefox, firefox-developer, firefox-nightly,
                 opera-stable, opera-beta, opera-developer, msedge, msedge-beta, msedge-dev, msedge-canary, msie,
-                brave, brave-beta, brave-nightly, vivaldi, min, pale-moon
+                brave, brave-beta, brave-nightly, vivaldi, min, pale-moon, shift, duckduckgo
     :return: Browser description and version.
     """
     match sys.platform:
