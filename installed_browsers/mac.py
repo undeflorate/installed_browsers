@@ -30,7 +30,9 @@ POSSIBLE_BROWSERS = (
     ("min", "com.electron.min", "CFBundleVersion"),
     ("kosmik", "paris.lithium.kosmik", "CFBundleShortVersionString"),
     ("pale-moon", "org.mozilla.pale*", "CFBundleShortVersionString"),
-    ("arc", "company.thebrowser.Browser", "CFBundleShortVersionString")
+    ("arc", "company.thebrowser.Browser", "CFBundleShortVersionString"),
+    ("shift", "com.shift.browser", "CFBundleShortVersionString"),
+    ("duckduckgo", "com.duckduckgo.mobile.ios", "CFBundleShortVersionString")
 )
 
 
@@ -86,7 +88,9 @@ def what_is_the_default_browser() -> Optional[str]:
         "com.electron.min": "Min",
         "paris.lithium.kosmik": "Kosmik",
         "org.mozilla.pale moon": "Pale Moon",
-        "company.thebrowser.browser": "Arc"
+        "company.thebrowser.browser": "Arc",
+        "com.shift.browser": "Shift Browser",
+        "com.duckduckgo.mobile.ios": "DuckDuckGo"
     }
 
     with PREFERENCES.open("rb") as config_file:
