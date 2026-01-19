@@ -28,7 +28,7 @@ pywin32 = { version = ">=303,<312", markers = "sys_platform == 'win32'" }
 
 [tool.poetry.dev-dependencies]
 autoflake = "^1.7.8"
-black = "^25.1.0"
+black = "^26.1.0"
 isort = "^7.0.0"
 mypy = "^1.4"
 pyproject-flake8 = "^5.0.4"
